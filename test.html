@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        /* 시스템 폰트 사용: 애플 기기에서는 San Francisco, 윈도우는 맑은 고딕 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f7; /* iOS 시스템 배경색 */
+            color: #1d1d1f; /* 애플 텍스트 컬러 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+
+        .iphone-container {
+            width: 90%;
+            max-width: 400px;
+        }
+
+        /* 큰 제목 */
+        .page-title {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-left: 10px;
+        }
+
+        /* 섹션 구분 */
+        .section-label {
+            font-size: 13px;
+            color: #8e8e93;
+            text-transform: uppercase;
+            margin-left: 15px;
+            margin-bottom: 7px;
+        }
+
+        /* 카드 스타일 설정창 느낌 */
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid #e5e5ea;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .value {
+            font-size: 16px;
+            color: #8e8e93;
+            text-align: right;
+        }
+
+        /* 설명 박스 */
+        .description-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .bold {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="iphone-container">
+    <h1 class="page-title">Profile</h1>
+
+    <div class="section-label">Basic Info</div>
+    <div class="card">
+        <div class="row">
+            <span class="label">이름</span>
+            <span class="value">캐릭터 이름</span>
+        </div>
+        <div class="row">
+            <span class="label">나이</span>
+            <span class="value">20</span>
+        </div>
+        <div class="row">
+            <span class="label">직업</span>
+            <span class="value">학생 / 능력자</span>
+        </div>
+    </div>
+
+    <div class="section-label">Appearance</div>
+    <div class="card">
+        <div class="row">
+            <span class="label">키</span>
+            <span class="value">178cm</span>
+        </div>
+        <div class="row">
+            <span class="label">눈색</span>
+            <span class="value">심해색</span>
+        </div>
+    </div>
+
+    <div class="section-label">Description</div>
+    <div class="description-card">
+        <span class="bold">특이사항:</span> 여기에 자캐의 상세한 설정을 적어주세요. 애플 설정창처럼 아주 깔끔하게 보일 거예요. <br><br>
+        줄바꿈을 하고 싶을 땐 이렇게 <b>&lt;br&gt;</b>을 쓰면 됩니다.
+    </div>
+</div>
+
+</body>
+</html>
