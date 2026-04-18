@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUN-PHIL | ARCHIVE SYSTEM</title>
+    <title>SUN-PHIL | TOTAL ARCHIVE</title>
     <style>
         :root {
             --bg: #000;
             --accent: #ff2d55;
-            --card: rgba(28, 28, 30, 0.8);
+            --card: rgba(28, 28, 30, 0.85);
+            --glass: blur(40px) saturate(200%);
             --border: rgba(255, 255, 255, 0.1);
-            --glass: blur(30px) saturate(180%);
         }
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -20,242 +20,267 @@
             height: 100vh; overflow: hidden;
         }
 
-        .layout { display: flex; height: 100vh; padding: 25px; gap: 25px; }
+        /* [레이아웃 프레임] */
+        .app-container { display: flex; height: 100vh; padding: 20px; gap: 20px; }
 
-        /* [사이드바] */
+        /* [사이드바: 음악 중심] */
         .sidebar {
-            width: 320px; background: var(--card); backdrop-filter: var(--glass);
+            width: 350px; background: var(--card); backdrop-filter: var(--glass);
             border-radius: 24px; border: 1px solid var(--border);
-            display: flex; flex-direction: column; padding: 35px 25px;
+            display: flex; flex-direction: column; padding: 30px;
         }
 
+        .nav-section { margin-bottom: 40px; }
         .nav-item {
-            padding: 16px 20px; border-radius: 14px; cursor: pointer;
-            font-size: 17px; font-weight: 600; margin-bottom: 10px;
-            transition: 0.3s; display: flex; align-items: center; gap: 12px;
+            padding: 14px 20px; border-radius: 12px; cursor: pointer;
+            font-size: 16px; font-weight: 600; margin-bottom: 8px;
+            transition: 0.3s; display: flex; align-items: center; gap: 10px;
         }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.05); }
-        .nav-item.active { background: var(--accent); color: #fff; }
+        .nav-item.active { background: var(--accent); }
 
-        /* [음악 엔진 컨트롤러] */
-        .music-engine {
-            margin-top: auto; background: rgba(0,0,0,0.3); border-radius: 18px; padding: 20px;
-            border: 1px solid var(--border);
+        /* [뮤직 플레이어 UI] */
+        .player-ui {
+            margin-top: auto; background: rgba(0,0,0,0.4); border-radius: 20px;
+            padding: 20px; border: 1px solid var(--border);
         }
-        .music-input {
-            width: 100%; background: #000; border: 1px solid #333;
-            color: #fff; font-size: 11px; padding: 8px; border-radius: 8px; margin-bottom: 10px;
-        }
+        .song-info { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        #current-title { font-size: 13px; font-weight: 700; color: var(--accent); }
+        
+        .controls { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; }
+        .ctrl-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 18px; }
+        
+        .progress-container { width: 100%; height: 4px; background: #333; border-radius: 2px; cursor: pointer; position: relative; }
+        .progress-bar { width: 0%; height: 100%; background: var(--accent); border-radius: 2px; }
 
-        /* [메인 뷰포트] */
-        .viewport {
+        /* [하위 페이지] */
+        .main-view {
             flex-grow: 1; background: var(--card); backdrop-filter: var(--glass);
             border-radius: 24px; border: 1px solid var(--border);
-            padding: 60px; overflow-y: auto; position: relative;
+            padding: 50px; overflow-y: auto;
         }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .page { display: none; animation: slideUp 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
-        .page.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* [컴포넌트] */
-        .header { font-size: 56px; font-weight: 800; letter-spacing: -2.5px; margin-bottom: 40px; }
-        
-        /* 캐릭터 리스트 동적 카드 */
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .char-card {
-            background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid var(--border);
-            overflow: hidden; transition: 0.4s; padding-bottom: 15px;
+        /* 유틸리티 */
+        .input-dark {
+            width: 100%; background: #111; border: 1px solid #333; padding: 12px;
+            border-radius: 10px; color: #fff; margin-bottom: 10px; font-size: 13px;
         }
-        .char-card:hover { transform: translateY(-8px); border-color: var(--accent); }
-        .char-img { width: 100%; aspect-ratio: 1; background: #222; object-fit: cover; }
-        .char-info { padding: 15px; text-align: center; }
-
-        /* 입력 폼 스타일 */
-        .form-group { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; margin-bottom: 30px; }
-        input, textarea {
-            width: 100%; background: #1c1c1e; border: 1px solid #3a3a3c;
-            border-radius: 12px; padding: 15px; color: #fff; margin-bottom: 12px; outline: none;
-        }
-        .btn {
-            background: var(--accent); color: white; border: none; padding: 14px 28px;
-            border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
-        .btn:active { transform: scale(0.95); }
-
-        /* 방명록 리스트 */
-        .guest-item {
-            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 16px; margin-bottom: 15px;
-            border-left: 4px solid var(--accent);
-        }
+        .btn-accent { background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="layout">
+<div class="app-container">
     <aside class="sidebar">
-        <div style="margin-bottom: 50px;">
-            <div style="font-size: 28px; font-weight: 800;">ARCHIVE.</div>
-            <div style="font-size: 14px; color: #86868b;">관리자: 선필 (Sun-phil)</div>
+        <div class="nav-section">
+            <h2 style="font-size: 24px; font-weight: 800; margin: 0 0 20px 0;">ARCHIVE</h2>
+            <div class="nav-item active" onclick="show('home', this)">홈</div>
+            <div class="nav-item" onclick="show('music-mgr', this)">음악 라이브러리</div>
+            <div class="nav-item" onclick="show('guest', this)">방명록</div>
         </div>
 
-        <nav>
-            <div class="nav-item active" onclick="switchPage('home', this)">✦ 대시보드</div>
-            <div class="nav-item" onclick="switchPage('chars', this)">✦ 캐릭터 엔진</div>
-            <div class="nav-item" onclick="switchPage('docs', this)">✦ 장문 아카이브</div>
-            <div class="nav-item" onclick="switchPage('guest', this)">✦ 방명록 소통</div>
-        </nav>
-
-        <div class="music-engine">
-            <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">BGM ENGINE V.1.0</div>
-            <input type="text" id="music-url" class="music-input" placeholder="MP3 또는 유튜브 주소 입력">
-            <button class="btn" style="width:100%; font-size: 12px; padding: 8px;" onclick="loadMusic()">음악 적용</button>
-            <div id="player-container" style="margin-top:15px;">
-                <audio id="audio-player" controls style="width: 100%; filter: invert(1); height: 30px;"></audio>
+        <div class="player-ui">
+            <div class="song-info">
+                <div style="font-size: 10px; opacity: 0.5; margin-bottom: 5px;">NOW PLAYING</div>
+                <div id="current-title">재생 중인 곡 없음</div>
             </div>
+            
+            <div class="progress-container" id="prog-root">
+                <div class="progress-bar" id="prog-fill"></div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" onclick="prevSong()">⏮</button>
+                <button class="ctrl-btn" id="play-pause" onclick="togglePlay()" style="font-size: 24px;">▶</button>
+                <button class="ctrl-btn" onclick="nextSong()">⏭</button>
+            </div>
+
+            <input type="range" id="volume-slider" min="0" max="100" value="50" style="width:100%; accent-color:var(--accent);">
         </div>
     </aside>
 
-    <main class="viewport">
-        <section id="page-home" class="page active">
-            <h1 class="header">진짜로<br>작동하는 공간.</h1>
-            <div class="form-group" style="max-width: 600px;">
-                <p style="font-size: 18px; color: #86868b; line-height: 1.6;">
-                    단순한 그림이 아닙니다. 캐릭터를 추가하고, 음악을 틀고, 글을 남겨보세요. 
-                    모든 데이터는 브라우저에 실시간으로 저장되어 새로고침해도 유지됩니다.
-                </p>
-            </div>
+    <main class="main-view">
+        
+        <section id="p-home" class="page active">
+            <h1 style="font-size: 50px; font-weight: 900; letter-spacing: -2px;">모든 것이<br>흐르는 공간.</h1>
+            <p style="color: #86868b; font-size: 18px; line-height: 1.6;">왼쪽의 음악 라이브러리에서 링크나 파일을 추가하면 플레이리스트가 생성됩니다.</p>
         </section>
 
-        <section id="page-chars" class="page">
-            <h1 class="header">캐릭터 엔진</h1>
-            <div class="form-group">
-                <h3>새 캐릭터 등록</h3>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="char-name" placeholder="캐릭터 이름">
-                    <input type="text" id="char-tag" placeholder="직업/나이 (예: 검사/19세)">
+        <section id="p-music-mgr" class="page">
+            <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 30px;">음악 라이브러리</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="background: rgba(255,255,255,0.03); padding: 25px; border-radius: 20px;">
+                    <h3>YouTube 링크 추가</h3>
+                    <input type="text" id="yt-url" class="input-dark" placeholder="유튜브 영상 주소 붙여넣기">
+                    <button class="btn-accent" onclick="addYoutube()">플레이리스트에 추가</button>
                 </div>
-                <input type="text" id="char-img" placeholder="이미지 URL (직접 넣기)">
-                <button class="btn" onclick="addCharacter()">데이터베이스에 추가</button>
+                <div style="background: rgba(255,255,255,0.03); padding: 25px; border-radius: 20px;">
+                    <h3>로컬 MP3 파일 추가</h3>
+                    <input type="file" id="mp3-file" class="input-dark" accept="audio/*">
+                    <button class="btn-accent" onclick="addLocalFile()">파일 업로드 적용</button>
+                </div>
             </div>
-            <div class="char-grid" id="char-list-container">
+
+            <h3 style="margin-top: 40px;">현재 플레이리스트</h3>
+            <div id="playlist-view" style="margin-top: 15px;">
                 </div>
         </section>
 
-        <section id="page-docs" class="page">
-            <h1 class="header">장문 기록</h1>
-            <div class="form-group">
-                <textarea id="doc-content" rows="15" placeholder="세계관 서사나 설정을 아주 길게 입력하세요."></textarea>
-                <button class="btn" onclick="saveDoc()">기록 저장하기</button>
+        <section id="p-guest" class="page">
+            <h2 style="font-size: 32px; font-weight: 800;">방명록</h2>
+            <div style="max-width: 500px; margin-top: 30px;">
+                <input type="text" id="g-name" class="input-dark" placeholder="닉네임">
+                <textarea id="g-msg" class="input-dark" rows="4" placeholder="메시지 내용"></textarea>
+                <button class="btn-accent" onclick="saveGuest()">작성하기</button>
             </div>
+            <div id="g-list" style="margin-top: 30px;"></div>
         </section>
 
-        <section id="page-guest" class="page">
-            <h1 class="header">방명록</h1>
-            <div class="form-group">
-                <input type="text" id="guest-name" placeholder="닉네임">
-                <textarea id="guest-msg" rows="3" placeholder="내용을 입력하세요."></textarea>
-                <button class="btn" onclick="addGuestMsg()">전송</button>
-            </div>
-            <div id="guest-list"></div>
-        </section>
     </main>
 </div>
 
-<div id="yt-wrap" style="display:none"></div>
+<div id="youtube-engine" style="position: absolute; top: -9999px;"></div>
+<audio id="local-engine"></audio>
+
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-    // [시스템 로직: 페이지 전환]
-    function switchPage(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('page-' + id).classList.add('active');
-        el.classList.add('active');
+    // 1. 시스템 변수
+    let playlist = JSON.parse(localStorage.getItem('sunphil_playlist')) || [];
+    let currentIndex = -1;
+    let ytPlayer;
+    const localAudio = document.getElementById('local-engine');
+    const playPauseBtn = document.getElementById('play-pause');
+
+    // 2. 유튜브 API 초기화
+    function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player('youtube-engine', {
+            height: '0', width: '0',
+            events: {
+                'onStateChange': onYTStateChange,
+                'onReady': () => console.log("유튜브 준비 완료")
+            }
+        });
     }
 
-    // [음악 엔진]
-    function loadMusic() {
-        const url = document.getElementById('music-url').value;
-        const player = document.getElementById('audio-player');
-        const ytWrap = document.getElementById('yt-wrap');
-
-        if(url.includes('youtube.com') || url.includes('youtu.be')) {
-            const vid = url.split('v=')[1] || url.split('/').pop();
-            ytWrap.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0"></iframe>`;
-            alert('유튜브 음악이 배경에서 재생됩니다.');
-        } else {
-            player.src = url;
-            player.play();
+    function onYTStateChange(event) {
+        if (event.data === YT.PlayerState.ENDED) nextSong();
+        if (event.data === YT.PlayerState.PLAYING) {
+            playPauseBtn.innerText = '⏸';
+            updateProgress();
         }
     }
 
-    // [캐릭터 엔진: 데이터 저장 & 불러오기]
-    let characters = JSON.parse(localStorage.getItem('myChars')) || [];
+    // 3. 음악 추가 로직
+    function addYoutube() {
+        const url = document.getElementById('yt-url').value;
+        if(!url) return;
+        const vid = url.split('v=')[1]?.split('&')[0] || url.split('/').pop();
+        playlist.push({ type: 'yt', id: vid, title: 'YouTube Track ' + (playlist.length + 1) });
+        saveAndRender();
+    }
 
-    function renderChars() {
-        const container = document.getElementById('char-list-container');
-        container.innerHTML = characters.map((c, i) => `
-            <div class="char-card">
-                <img src="${c.img || 'https://via.placeholder.com/300'}" class="char-img">
-                <div class="char-info">
-                    <div style="font-weight: 800; font-size: 18px;">${c.name}</div>
-                    <div style="font-size: 12px; color: var(--accent);">${c.tag}</div>
-                    <button onclick="deleteChar(${i})" style="margin-top:10px; background:none; border:none; color:#555; cursor:pointer; font-size:10px;">삭제</button>
-                </div>
+    function addLocalFile() {
+        const file = document.getElementById('mp3-file').files[0];
+        if(!file) return;
+        const url = URL.createObjectURL(file);
+        playlist.push({ type: 'local', id: url, title: file.name });
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('sunphil_playlist', JSON.stringify(playlist));
+        renderPlaylist();
+    }
+
+    function renderPlaylist() {
+        const view = document.getElementById('playlist-view');
+        view.innerHTML = playlist.map((s, i) => `
+            <div style="display:flex; justify-content:space-between; padding:15px; background:rgba(255,255,255,0.05); border-radius:10px; margin-bottom:10px;">
+                <span>${s.title}</span>
+                <button onclick="playTarget(${i})" style="background:var(--accent); border:none; color:#fff; border-radius:5px; cursor:pointer;">재생</button>
             </div>
         `).join('');
     }
 
-    function addCharacter() {
-        const name = document.getElementById('char-name').value;
-        const tag = document.getElementById('char-tag').value;
-        const img = document.getElementById('char-img').value;
-        if(!name) return;
-        characters.push({name, tag, img});
-        localStorage.setItem('myChars', JSON.stringify(characters));
-        renderChars();
+    // 4. 플레이어 제어 로직
+    function playTarget(index) {
+        currentIndex = index;
+        const song = playlist[currentIndex];
+        document.getElementById('current-title').innerText = song.title;
+
+        // 다른 엔진 중지
+        ytPlayer.stopVideo();
+        localAudio.pause();
+
+        if (song.type === 'yt') {
+            ytPlayer.loadVideoById(song.id);
+            ytPlayer.playVideo();
+        } else {
+            localAudio.src = song.id;
+            localAudio.play();
+            playPauseBtn.innerText = '⏸';
+        }
     }
 
-    function deleteChar(i) {
-        characters.splice(i, 1);
-        localStorage.setItem('myChars', JSON.stringify(characters));
-        renderChars();
+    function togglePlay() {
+        if (currentIndex === -1) return;
+        const song = playlist[currentIndex];
+        
+        if (song.type === 'yt') {
+            const state = ytPlayer.getPlayerState();
+            if (state === 1) { ytPlayer.pauseVideo(); playPauseBtn.innerText = '▶'; }
+            else { ytPlayer.playVideo(); playPauseBtn.innerText = '⏸'; }
+        } else {
+            if (localAudio.paused) { localAudio.play(); playPauseBtn.innerText = '⏸'; }
+            else { localAudio.pause(); playPauseBtn.innerText = '▶'; }
+        }
     }
 
-    // [방명록 엔진]
-    let messages = JSON.parse(localStorage.getItem('myGuest')) || [];
-
-    function renderGuest() {
-        const list = document.getElementById('guest-list');
-        list.innerHTML = messages.map(m => `
-            <div class="guest-item">
-                <div style="font-weight: 800; margin-bottom: 5px;">${m.name}</div>
-                <div style="font-size: 14px; opacity: 0.8;">${m.msg}</div>
-            </div>
-        `).reverse().join('');
+    function nextSong() {
+        if (currentIndex < playlist.length - 1) playTarget(currentIndex + 1);
     }
 
-    function addGuestMsg() {
-        const name = document.getElementById('guest-name').value;
-        const msg = document.getElementById('guest-msg').value;
-        if(!name || !msg) return;
-        messages.push({name, msg});
-        localStorage.setItem('myGuest', JSON.stringify(messages));
-        renderGuest();
+    function prevSong() {
+        if (currentIndex > 0) playTarget(currentIndex - 1);
     }
 
-    // [문서 저장 엔진]
-    function saveDoc() {
-        const content = document.getElementById('doc-content').value;
-        localStorage.setItem('myDoc', content);
-        alert('기록이 안전하게 보관되었습니다.');
+    // 5. 프로그레스 바 실시간 업데이트
+    function updateProgress() {
+        setInterval(() => {
+            let ratio = 0;
+            if (currentIndex === -1) return;
+            const song = playlist[currentIndex];
+            if (song.type === 'yt') {
+                ratio = (ytPlayer.getCurrentTime() / ytPlayer.getDuration()) * 100;
+            } else {
+                ratio = (localAudio.currentTime / localAudio.duration) * 100;
+            }
+            document.getElementById('prog-fill').style.width = ratio + '%';
+        }, 500);
     }
 
-    // 초기화
+    // [시스템 스위칭]
+    function show(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('p-' + id).classList.add('active');
+        el.classList.add('active');
+    }
+
+    // 볼륨 조절
+    document.getElementById('volume-slider').oninput = function() {
+        const vol = this.value;
+        localAudio.volume = vol / 100;
+        if (ytPlayer) ytPlayer.setVolume(vol);
+    };
+
     window.onload = () => {
-        renderChars();
-        renderGuest();
-        document.getElementById('doc-content').value = localStorage.getItem('myDoc') || '';
+        renderPlaylist();
+        updateProgress();
     };
 </script>
 
