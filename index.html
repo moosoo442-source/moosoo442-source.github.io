@@ -3,128 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>Archive</title>
     <style>
-        /* 시스템 폰트 사용: 애플 기기에서는 San Francisco, 윈도우는 맑은 고딕 */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f2f2f7; /* iOS 시스템 배경색 */
-            color: #1d1d1f; /* 애플 텍스트 컬러 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            padding-top: 50px;
-        }
+        body { margin: 0; background-color: #f5f5f7; color: #1d1d1f; font-family: -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 440px; margin: 0 auto; padding: 40px 20px; }
+        
+        h1 { font-size: 32px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.5px; }
 
-        .iphone-container {
-            width: 90%;
-            max-width: 400px;
+        /* 캐릭터 선택 버튼들 */
+        .char-selector { display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 10px; }
+        .char-btn { 
+            background: #fff; border: none; padding: 10px 18px; border-radius: 20px; 
+            font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s;
         }
+        .char-btn.active { background: #007aff; color: #fff; }
 
-        /* 큰 제목 */
-        .page-title {
-            font-size: 34px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            padding-left: 10px;
-        }
+        /* 정보 카드 스타일 */
+        .section-title { font-size: 13px; color: #86868b; margin: 0 0 8px 16px; text-transform: uppercase; }
+        .card { background: #fff; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; }
+        .list-item { display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 0.5px solid #f2f2f7; }
+        .list-item:last-child { border-bottom: none; }
+        .label { font-weight: 500; }
+        .value { color: #86868b; }
+        .memo-box { padding: 16px; font-size: 15px; line-height: 1.6; }
 
-        /* 섹션 구분 */
-        .section-label {
-            font-size: 13px;
-            color: #8e8e93;
-            text-transform: uppercase;
-            margin-left: 15px;
-            margin-bottom: 7px;
-        }
-
-        /* 카드 스타일 설정창 느낌 */
-        .card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 0.5px solid #e5e5ea;
-        }
-
-        .row:last-child {
-            border-bottom: none;
-        }
-
-        .label {
-            font-size: 16px;
-            font-weight: 400;
-        }
-
-        .value {
-            font-size: 16px;
-            color: #8e8e93;
-            text-align: right;
-        }
-
-        /* 설명 박스 */
-        .description-card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 15px;
-            line-height: 1.5;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .bold {
-            font-weight: 600;
-        }
+        footer { text-align: center; font-size: 12px; color: #a1a1a6; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<div class="iphone-container">
-    <h1 class="page-title">Profile</h1>
+<div class="wrapper">
+    <h1>Archive</h1>
 
-    <div class="section-label">Basic Info</div>
-    <div class="card">
-        <div class="row">
-            <span class="label">이름</span>
-            <span class="value">캐릭터 이름</span>
+    <div class="char-selector" id="menu">
         </div>
-        <div class="row">
-            <span class="label">나이</span>
-            <span class="value">20</span>
+
+    <div id="content">
+        <p class="section-title">Identity</p>
+        <div class="card">
+            <div class="list-item"><span class="label">이름</span><span class="value" id="name">-</span></div>
+            <div class="list-item"><span class="label">나이</span><span class="value" id="age">-</span></div>
         </div>
-        <div class="row">
-            <span class="label">직업</span>
-            <span class="value">학생 / 능력자</span>
+
+        <p class="section-title">Details</p>
+        <div class="card">
+            <div class="list-item"><span class="label">특징</span><span class="value" id="trait">-</span></div>
+        </div>
+
+        <p class="section-title">Background</p>
+        <div class="card">
+            <div class="memo-box" id="desc">버튼을 눌러 캐릭터를 선택하세요.</div>
         </div>
     </div>
 
-    <div class="section-label">Appearance</div>
-    <div class="card">
-        <div class="row">
-            <span class="label">키</span>
-            <span class="value">178cm</span>
-        </div>
-        <div class="row">
-            <span class="label">눈색</span>
-            <span class="value">심해색</span>
-        </div>
-    </div>
-
-    <div class="section-label">Description</div>
-    <div class="description-card">
-        <span class="bold">특이사항:</span> 여기에 자캐의 상세한 설정을 적어주세요. 애플 설정창처럼 아주 깔끔하게 보일 거예요. <br><br>
-        줄바꿈을 하고 싶을 땐 이렇게 <b>&lt;br&gt;</b>을 쓰면 됩니다.
-    </div>
+    <footer>© 2026 Crafted by Sun-phil</footer>
 </div>
+
+<script>
+    // 📝 여기에 캐릭터 데이터를 추가하세요!
+    const characters = [
+        { name: "선필", age: "20", trait: "총명함", desc: "이 사이트의 제작자입니다. <br> 애플 스타일을 좋아합니다." },
+        { name: "캐릭터 A", age: "18", trait: "낙천적", desc: "여기에 A의 상세 스토리를 적으세요." },
+        { name: "캐릭터 B", age: "25", trait: "과묵함", desc: "여기에 B의 상세 스토리를 적으세요." }
+    ];
+
+    const menu = document.getElementById('menu');
+    
+    // 버튼 생성 및 클릭 이벤트
+    characters.forEach((char, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'char-btn';
+        btn.innerText = char.name;
+        btn.onclick = () => showChar(index, btn);
+        menu.appendChild(btn);
+        if(index === 0) showChar(0, btn); // 첫 번째 캐릭터 기본 선택
+    });
+
+    function showChar(index, btn) {
+        const c = characters[index];
+        document.getElementById('name').innerText = c.name;
+        document.getElementById('age').innerText = c.age;
+        document.getElementById('trait').innerText = c.trait;
+        document.getElementById('desc').innerHTML = c.desc;
+
+        // 버튼 활성화 스타일 처리
+        document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+</script>
 
 </body>
 </html>
