@@ -3,227 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>선필 아카이브 | ARCHIVE</title>
+    <title>SUN-PHIL | ARCHIVE SYSTEM</title>
     <style>
-        /* 1. 디자인 코어: 애플 스타일 미니멀리즘 + 커스텀 데코 */
         :root {
-            --bg: #000000;
-            --card-bg: rgba(28, 28, 30, 0.7);
-            --accent: #ff2d55; /* 애플 뮤직 핑크 */
-            --sub-text: #86868b;
-            --glass: blur(25px) saturate(180%);
+            --bg: #000;
+            --accent: #ff2d55;
+            --card: rgba(28, 28, 30, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: blur(30px) saturate(180%);
         }
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         body {
             margin: 0; background: var(--bg); color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
-            overflow: hidden;
+            height: 100vh; overflow: hidden;
         }
 
-        /* 배경에 은은한 빛 효과 */
-        .bg-gradient {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% -20%, #1c1c1e, #000);
-            z-index: -1;
-        }
+        .layout { display: flex; height: 100vh; padding: 25px; gap: 25px; }
 
-        /* 2. 전체 레이아웃 프레임 */
-        .container {
-            display: flex; height: 100vh; padding: 20px; gap: 20px;
-        }
-
-        /* 왼쪽 사이드바 (애플 앱 스타일) */
+        /* [사이드바] */
         .sidebar {
-            width: 280px; background: var(--card-bg); backdrop-filter: var(--glass);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; flex-direction: column; padding: 30px 20px;
+            width: 320px; background: var(--card); backdrop-filter: var(--glass);
+            border-radius: 24px; border: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 35px 25px;
         }
 
-        .profile-area { text-align: center; margin-bottom: 40px; }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 15px; }
-        .profile-name { font-size: 22px; font-weight: 700; letter-spacing: -1px; }
-
-        .nav-menu { flex-grow: 1; }
-        .nav-btn {
-            padding: 14px 18px; border-radius: 12px; cursor: pointer;
-            font-size: 16px; font-weight: 500; transition: 0.3s;
-            margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+        .nav-item {
+            padding: 16px 20px; border-radius: 14px; cursor: pointer;
+            font-size: 17px; font-weight: 600; margin-bottom: 10px;
+            transition: 0.3s; display: flex; align-items: center; gap: 12px;
         }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); }
-        .nav-btn.active { background: var(--accent); color: #fff; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .nav-item.active { background: var(--accent); color: #fff; }
 
-        /* 3. 중앙 메인 뷰포트 (하위 페이지 전부 구현) */
-        .main-content {
-            flex-grow: 1; background: var(--card-bg); backdrop-filter: var(--glass);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            position: relative; overflow-y: auto; padding: 60px;
+        /* [음악 엔진 컨트롤러] */
+        .music-engine {
+            margin-top: auto; background: rgba(0,0,0,0.3); border-radius: 18px; padding: 20px;
+            border: 1px solid var(--border);
+        }
+        .music-input {
+            width: 100%; background: #000; border: 1px solid #333;
+            color: #fff; font-size: 11px; padding: 8px; border-radius: 8px; margin-bottom: 10px;
         }
 
-        .page { display: none; animation: fadeIn 0.6s ease; }
+        /* [메인 뷰포트] */
+        .viewport {
+            flex-grow: 1; background: var(--card); backdrop-filter: var(--glass);
+            border-radius: 24px; border: 1px solid var(--border);
+            padding: 60px; overflow-y: auto; position: relative;
+        }
+
+        .page { display: none; animation: slideUp 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 4. 음악 플레이어 (사용자 설정 가능) */
-        .music-player {
-            background: rgba(44, 44, 46, 0.8); border-radius: 15px; padding: 15px;
-            margin-top: auto; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .music-title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
-        .music-controls input { width: 100%; accent-color: var(--accent); cursor: pointer; }
-
-        /* 5. 컴포넌트 디자인 */
-        .content-header { font-size: 48px; font-weight: 800; margin-bottom: 30px; letter-spacing: -2px; }
-        .grid-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        /* [컴포넌트] */
+        .header { font-size: 56px; font-weight: 800; letter-spacing: -2.5px; margin-bottom: 40px; }
+        
+        /* 캐릭터 리스트 동적 카드 */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .char-card {
-            background: rgba(255,255,255,0.03); border-radius: 15px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+            background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid var(--border);
+            overflow: hidden; transition: 0.4s; padding-bottom: 15px;
         }
-        .char-card:hover { transform: scale(1.03); border-color: var(--accent); }
-        .char-card img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-        .char-card-info { padding: 15px; }
+        .char-card:hover { transform: translateY(-8px); border-color: var(--accent); }
+        .char-img { width: 100%; aspect-ratio: 1; background: #222; object-fit: cover; }
+        .char-info { padding: 15px; text-align: center; }
 
-        /* 방명록 입력칸 */
-        .input-group { margin-top: 30px; }
+        /* 입력 폼 스타일 */
+        .form-group { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; margin-bottom: 30px; }
         input, textarea {
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; padding: 15px; color: #fff; margin-bottom: 10px; outline: none;
+            width: 100%; background: #1c1c1e; border: 1px solid #3a3a3c;
+            border-radius: 12px; padding: 15px; color: #fff; margin-bottom: 12px; outline: none;
         }
-        .submit-btn { background: var(--accent); border: none; padding: 12px 25px; border-radius: 10px; color: #fff; font-weight: bold; cursor: pointer; }
+        .btn {
+            background: var(--accent); color: white; border: none; padding: 14px 28px;
+            border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
 
-        /* 스크롤바 커스텀 */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 10px; }
+        /* 방명록 리스트 */
+        .guest-item {
+            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 16px; margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+        }
     </style>
 </head>
 <body>
 
-<div class="bg-gradient"></div>
-
-<div class="container">
+<div class="layout">
     <aside class="sidebar">
-        <div class="profile-area">
-            <div class="profile-img" style="background: url('https://via.placeholder.com/100') center/cover;"></div>
-            <div class="profile-name">선필 (Sun-phil)</div>
-            <div style="font-size: 13px; color: var(--sub-text); margin-top: 5px;">개인 아카이브 시스템</div>
+        <div style="margin-bottom: 50px;">
+            <div style="font-size: 28px; font-weight: 800;">ARCHIVE.</div>
+            <div style="font-size: 14px; color: #86868b;">관리자: 선필 (Sun-phil)</div>
         </div>
 
-        <nav class="nav-menu">
-            <div class="nav-btn active" onclick="move('home', this)">홈</div>
-            <div class="nav-btn" onclick="move('profile', this)">캐릭터 프로필</div>
-            <div class="nav-btn" onclick="move('gallery', this)">갤러리</div>
-            <div class="nav-btn" onclick="move('docs', this)">세계관 기록</div>
-            <div class="nav-btn" onclick="move('guest', this)">방명록</div>
+        <nav>
+            <div class="nav-item active" onclick="switchPage('home', this)">✦ 대시보드</div>
+            <div class="nav-item" onclick="switchPage('chars', this)">✦ 캐릭터 엔진</div>
+            <div class="nav-item" onclick="switchPage('docs', this)">✦ 장문 아카이브</div>
+            <div class="nav-item" onclick="switchPage('guest', this)">✦ 방명록 소통</div>
         </nav>
 
-        <div class="music-player">
-            <div class="music-title">♬ 실시간 재생 중</div>
-            <div style="font-size: 11px; margin-bottom: 10px; opacity: 0.7;">아래 오디오 섹션에서 관리하세요</div>
-            <audio id="main-audio" controls style="width: 100%; height: 30px; filter: invert(1);">
-                <source src="원하는_음악_파일_주소.mp3" type="audio/mpeg">
-            </audio>
+        <div class="music-engine">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">BGM ENGINE V.1.0</div>
+            <input type="text" id="music-url" class="music-input" placeholder="MP3 또는 유튜브 주소 입력">
+            <button class="btn" style="width:100%; font-size: 12px; padding: 8px;" onclick="loadMusic()">음악 적용</button>
+            <div id="player-container" style="margin-top:15px;">
+                <audio id="audio-player" controls style="width: 100%; filter: invert(1); height: 30px;"></audio>
+            </div>
         </div>
     </aside>
 
-    <main class="main-content">
-        
-        <section id="p-home" class="page active">
-            <h1 class="content-header">반갑습니다.</h1>
-            <p style="font-size: 20px; color: var(--sub-text); line-height: 1.6; max-width: 600px;">
-                이곳은 선필의 모든 창작물과 캐릭터 설정이 모여있는 개인 홈페이지입니다. 
-                가장 완벽한 미감과 사용자 경험을 위해 설계되었습니다.
-            </p>
-            <div style="margin-top: 50px; display: flex; gap: 20px;">
-                <div style="flex: 1; padding: 25px; background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
-                    <h3 style="color: var(--accent);">최근 업데이트</h3>
-                    <p style="font-size: 14px; opacity: 0.6;">2026.04.18 - 하위 페이지 전체 시스템 구현 완료</p>
+    <main class="viewport">
+        <section id="page-home" class="page active">
+            <h1 class="header">진짜로<br>작동하는 공간.</h1>
+            <div class="form-group" style="max-width: 600px;">
+                <p style="font-size: 18px; color: #86868b; line-height: 1.6;">
+                    단순한 그림이 아닙니다. 캐릭터를 추가하고, 음악을 틀고, 글을 남겨보세요. 
+                    모든 데이터는 브라우저에 실시간으로 저장되어 새로고침해도 유지됩니다.
+                </p>
+            </div>
+        </section>
+
+        <section id="page-chars" class="page">
+            <h1 class="header">캐릭터 엔진</h1>
+            <div class="form-group">
+                <h3>새 캐릭터 등록</h3>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="char-name" placeholder="캐릭터 이름">
+                    <input type="text" id="char-tag" placeholder="직업/나이 (예: 검사/19세)">
                 </div>
+                <input type="text" id="char-img" placeholder="이미지 URL (직접 넣기)">
+                <button class="btn" onclick="addCharacter()">데이터베이스에 추가</button>
             </div>
-        </section>
-
-        <section id="p-profile" class="page">
-            <h1 class="content-header">캐릭터 리스트</h1>
-            <div class="grid-box">
-                <div class="char-card">
-                    <img src="https://via.placeholder.com/300x300">
-                    <div class="char-card-info">
-                        <div style="font-weight: bold;">메인 캐릭터 A</div>
-                        <div style="font-size: 12px; color: var(--accent);">20세 / 소속불명</div>
-                    </div>
+            <div class="char-grid" id="char-list-container">
                 </div>
-                <div class="char-card">
-                    <img src="https://via.placeholder.com/300x300">
-                    <div class="char-card-info">
-                        <div style="font-weight: bold;">서브 캐릭터 B</div>
-                        <div style="font-size: 12px; color: var(--accent);">??세 / 정령</div>
-                    </div>
-                </div>
+        </section>
+
+        <section id="page-docs" class="page">
+            <h1 class="header">장문 기록</h1>
+            <div class="form-group">
+                <textarea id="doc-content" rows="15" placeholder="세계관 서사나 설정을 아주 길게 입력하세요."></textarea>
+                <button class="btn" onclick="saveDoc()">기록 저장하기</button>
             </div>
         </section>
 
-        <section id="p-gallery" class="page">
-            <h1 class="content-header">갤러리</h1>
-            <div style="columns: 3; gap: 15px;">
-                <div style="background: rgba(255,255,255,0.05); height: 250px; border-radius: 15px; margin-bottom: 15px;"></div>
-                <div style="background: rgba(255,255,255,0.05); height: 180px; border-radius: 15px; margin-bottom: 15px;"></div>
-                <div style="background: rgba(255,255,255,0.05); height: 300px; border-radius: 15px; margin-bottom: 15px;"></div>
-                <div style="background: rgba(255,255,255,0.05); height: 200px; border-radius: 15px; margin-bottom: 15px;"></div>
+        <section id="page-guest" class="page">
+            <h1 class="header">방명록</h1>
+            <div class="form-group">
+                <input type="text" id="guest-name" placeholder="닉네임">
+                <textarea id="guest-msg" rows="3" placeholder="내용을 입력하세요."></textarea>
+                <button class="btn" onclick="addGuestMsg()">전송</button>
             </div>
+            <div id="guest-list"></div>
         </section>
-
-        <section id="p-docs" class="page">
-            <h1 class="content-header">아카이브</h1>
-            <div style="max-width: 700px; line-height: 2; font-size: 17px; color: #d1d1d6;">
-                <h2 style="color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px;">[ 제 1장: 시작의 별 ]</h2>
-                여기에 당신이 창작한 아주 긴 서사를 적어 넣으세요. 
-                가독성이 뛰어난 서체와 행간으로 마치 한 편의 소설을 읽는 듯한 느낌을 줍니다. 
-                노션보다 백배는 더 예쁘고 몰입감 넘치는 페이지가 될 것입니다.
-                <br><br>
-                ... 긴 서사 내용 ...
-            </div>
-        </section>
-
-        <section id="p-guest" class="page">
-            <h1 class="content-header">방명록</h1>
-            <div class="input-group" style="max-width: 500px;">
-                <input type="text" placeholder="닉네임">
-                <textarea rows="4" placeholder="메시지를 남겨주세요."></textarea>
-                <button class="submit-btn">작성하기</button>
-            </div>
-            <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px;">
-                    <b>관리자</b>: 방문해주셔서 감사합니다! ✧
-                </div>
-            </div>
-        </section>
-
     </main>
 </div>
 
-<div style="position: fixed; bottom: -100px; left: 0;">
-    <iframe id="yt-player" width="0" height="0" src="https://www.youtube.com/embed/원하는_영상_ID?autoplay=1&mute=0" frameborder="0"></iframe>
-</div>
+<div id="yt-wrap" style="display:none"></div>
 
 <script>
-    // 하위 페이지 전환 함수
-    function move(pageId, btn) {
-        // 모든 버튼 비활성화
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        // 모든 페이지 숨기기
+    // [시스템 로직: 페이지 전환]
+    function switchPage(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        
-        // 대상 페이지 표시
-        document.getElementById('p-' + pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('page-' + id).classList.add('active');
+        el.classList.add('active');
     }
 
-    // 음악 재생 관리 (선택 사항)
-    const audio = document.getElementById('main-audio');
-    // 사용자가 첫 클릭을 하면 음악 재생 (브라우저 정책)
-    document.addEventListener('click', () => {
-        // audio.play().catch(() => {}); 
-    }, {once: true});
+    // [음악 엔진]
+    function loadMusic() {
+        const url = document.getElementById('music-url').value;
+        const player = document.getElementById('audio-player');
+        const ytWrap = document.getElementById('yt-wrap');
+
+        if(url.includes('youtube.com') || url.includes('youtu.be')) {
+            const vid = url.split('v=')[1] || url.split('/').pop();
+            ytWrap.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0"></iframe>`;
+            alert('유튜브 음악이 배경에서 재생됩니다.');
+        } else {
+            player.src = url;
+            player.play();
+        }
+    }
+
+    // [캐릭터 엔진: 데이터 저장 & 불러오기]
+    let characters = JSON.parse(localStorage.getItem('myChars')) || [];
+
+    function renderChars() {
+        const container = document.getElementById('char-list-container');
+        container.innerHTML = characters.map((c, i) => `
+            <div class="char-card">
+                <img src="${c.img || 'https://via.placeholder.com/300'}" class="char-img">
+                <div class="char-info">
+                    <div style="font-weight: 800; font-size: 18px;">${c.name}</div>
+                    <div style="font-size: 12px; color: var(--accent);">${c.tag}</div>
+                    <button onclick="deleteChar(${i})" style="margin-top:10px; background:none; border:none; color:#555; cursor:pointer; font-size:10px;">삭제</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addCharacter() {
+        const name = document.getElementById('char-name').value;
+        const tag = document.getElementById('char-tag').value;
+        const img = document.getElementById('char-img').value;
+        if(!name) return;
+        characters.push({name, tag, img});
+        localStorage.setItem('myChars', JSON.stringify(characters));
+        renderChars();
+    }
+
+    function deleteChar(i) {
+        characters.splice(i, 1);
+        localStorage.setItem('myChars', JSON.stringify(characters));
+        renderChars();
+    }
+
+    // [방명록 엔진]
+    let messages = JSON.parse(localStorage.getItem('myGuest')) || [];
+
+    function renderGuest() {
+        const list = document.getElementById('guest-list');
+        list.innerHTML = messages.map(m => `
+            <div class="guest-item">
+                <div style="font-weight: 800; margin-bottom: 5px;">${m.name}</div>
+                <div style="font-size: 14px; opacity: 0.8;">${m.msg}</div>
+            </div>
+        `).reverse().join('');
+    }
+
+    function addGuestMsg() {
+        const name = document.getElementById('guest-name').value;
+        const msg = document.getElementById('guest-msg').value;
+        if(!name || !msg) return;
+        messages.push({name, msg});
+        localStorage.setItem('myGuest', JSON.stringify(messages));
+        renderGuest();
+    }
+
+    // [문서 저장 엔진]
+    function saveDoc() {
+        const content = document.getElementById('doc-content').value;
+        localStorage.setItem('myDoc', content);
+        alert('기록이 안전하게 보관되었습니다.');
+    }
+
+    // 초기화
+    window.onload = () => {
+        renderChars();
+        renderGuest();
+        document.getElementById('doc-content').value = localStorage.getItem('myDoc') || '';
+    };
 </script>
 
 </body>
