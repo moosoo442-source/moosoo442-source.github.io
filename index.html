@@ -3,313 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Character Database</title>
+    <title>✧ MY ARCHIVE ✧</title>
     <style>
-        /* 1. 디자인 기본 테마 (Notion Clean) */
-        :root {
-            --notion-text: #37352f;
-            --notion-bg: #ffffff;
-            --notion-sidebar: #fbfbfa;
-            --notion-hover: #efefef;
-            --notion-active: #ebebeb;
-            --notion-border: #efefef;
-            --notion-secondary: rgba(55, 53, 47, 0.65);
-            --notion-accent: #2383e2; /* 노션 링크/포인트 블루 */
+        /* 1. 핵심 시스템: 테마별 변수 설정 */
+        :root[data-theme="fantasy"] {
+            --bg-img: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920');
+            --panel-bg: rgba(20, 20, 30, 0.7);
+            --accent: #e0b0ff; /* 연보라 */
+            --border: rgba(224, 176, 255, 0.4);
+            --text: #fff;
         }
 
-        * { box-sizing: border-box; }
+        :root[data-theme="cyber"] {
+            --bg-img: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1920');
+            --panel-bg: rgba(0, 5, 10, 0.85);
+            --accent: #00f3ff; /* 사이언 */
+            --border: #00f3ff;
+            --text: #00f3ff;
+        }
 
+        :root[data-theme="decora"] {
+            --bg-img: url('https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=1920');
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --accent: #ff007a; /* 핫핑크 */
+            --border: #ff007a;
+            --text: #333;
+        }
+
+        /* 2. 베이스 레이아웃 */
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            background-color: var(--notion-bg);
-            color: var(--notion-text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            overflow: hidden; /* 전체 페이지 스크롤 방지 */
+            margin: 0; padding: 0; height: 100vh;
+            background: var(--bg-img) no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text);
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            display: flex; overflow: hidden;
+            transition: 0.5s ease-in-out;
         }
 
-        /* 2. 사이드바 내비게이션 */
+        /* 3. 사이드바 (데코라 디자인) */
         .sidebar {
-            width: 280px;
-            background-color: var(--notion-sidebar);
-            border-right: 1px solid var(--notion-border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            padding: 24px 12px;
-            user-select: none;
+            width: 260px; height: 94vh; margin: 3vh 0 3vh 30px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: 30px;
+            display: flex; flex-direction: column; padding: 30px 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 100;
         }
 
-        .sidebar-header {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--notion-secondary);
-            padding: 0 12px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-group { margin-bottom: 24px; }
-
-        .nav-item {
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s ease;
-            color: var(--notion-text);
-            text-decoration: none;
-        }
-
-        .nav-item:hover { background-color: var(--notion-hover); }
-        .nav-item.active { background-color: var(--notion-active); font-weight: 600; }
-        .nav-icon { font-size: 16px; }
-
-        /* 3. 메인 콘텐츠 프레임워크 */
-        .main-frame {
-            flex-grow: 1;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        /* 노션 특유의 상단 여백과 너비 제한 */
-        .content-layout {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 80px 40px 100px 40px;
-        }
-
-        /* 4. 페이지 상단 (헤더 및 속성) */
-        .page-title {
-            font-size: 40px;
-            font-weight: 700;
-            margin: 0 0 20px 0;
-            line-height: 1.2;
-            outline: none;
-        }
-
-        /* 노션 속성 테이블 영역 */
-        .property-container {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            row-gap: 4px;
-            margin-bottom: 32px;
-            padding: 4px 0;
-        }
-
-        .prop-label {
-            font-size: 14px;
-            color: var(--notion-secondary);
-            display: flex;
-            align-items: center;
-            padding: 6px 0;
-        }
-
-        .prop-value {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            padding: 6px 0;
-            font-weight: 400;
-        }
-
-        .tag {
+        .owner-profile {
+            width: 100px; height: 100px; border-radius: 50%;
+            border: 3px solid var(--accent); margin: 0 auto 15px;
+            box-shadow: 0 0 10px var(--accent);
             background: #eee;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-right: 6px;
         }
 
-        /* 5. 본문 구분선 및 스타일 */
-        .divider {
-            height: 1px;
-            background-color: var(--notion-border);
-            margin: 8px 0 32px 0;
+        .nav-link {
+            padding: 12px 20px; margin: 5px 0; border-radius: 15px;
+            cursor: pointer; font-weight: bold; font-size: 15px;
+            transition: 0.3s; border: 1px solid transparent;
+            text-align: center; list-style: none;
         }
 
-        .body-section {
-            font-size: 16px;
-            line-height: 1.65;
-            color: var(--notion-text);
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+            text-shadow: 0 0 5px var(--accent);
         }
 
-        /* 노션 스타일 콜아웃(Callout) */
-        .callout {
-            background: #f1f1ef;
-            border-radius: 4px;
-            padding: 16px;
-            margin: 24px 0;
-            display: flex;
-            gap: 12px;
+        /* 4. 메인 콘텐츠 대시보드 */
+        .viewport {
+            flex-grow: 1; padding: 3vh 30px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto 1fr auto; gap: 20px;
+            overflow-y: auto;
         }
 
-        /* 모바일 대응 레이아웃 */
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--notion-border); padding: 12px; }
-            .main-frame { height: 100%; }
-            .content-layout { padding: 40px 20px; }
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 20px; padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            animation: slideIn 0.6s ease-out;
         }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 5. 페이지 전환 시스템 */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* 6. 컴포넌트 디자인 */
+        .theme-switcher {
+            display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
+        }
+        .theme-btn {
+            width: 25px; height: 25px; border-radius: 50%; border: 2px solid #fff; cursor: pointer;
+        }
+
+        .character-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;
+        }
+        .char-card {
+            background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px;
+            text-align: center; border: 1px solid var(--border); transition: 0.3s;
+        }
+        .char-card:hover { transform: scale(1.05); background: rgba(255,255,255,0.05); }
+
+        .status-bar { height: 10px; background: #333; border-radius: 5px; margin: 5px 0; overflow: hidden; }
+        .status-fill { height: 100%; background: var(--accent); transition: 1s; }
+
+        h2 { font-size: 24px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
     </style>
 </head>
-<body>
+<body data-theme="fantasy">
 
     <aside class="sidebar">
-        <div class="nav-group">
-            <div class="sidebar-header">Main Workspace</div>
-            <div class="nav-item" onclick="loadPage('home')"><span class="nav-icon">🏠</span> Dashboard</div>
+        <div class="owner-profile"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-weight: bold; font-size: 18px;">SUN-PHIL</div>
+            <div style="font-size: 12px; opacity: 0.7;">Preemptive Victory</div>
         </div>
 
-        <div class="nav-group">
-            <div class="sidebar-header">Characters Database</div>
-            <div id="character-nav">
-                </div>
+        <div class="theme-switcher">
+            <div class="theme-btn" style="background: #e0b0ff;" onclick="setTheme('fantasy')"></div>
+            <div class="theme-btn" style="background: #00f3ff;" onclick="setTheme('cyber')"></div>
+            <div class="theme-btn" style="background: #ff007a;" onclick="setTheme('decora')"></div>
         </div>
-        
-        <div class="nav-group" style="margin-top: auto;">
-            <div class="nav-item" style="color: var(--notion-secondary);"><span class="nav-icon">⚙️</span> Settings</div>
+
+        <nav>
+            <div class="nav-link active" onclick="openPage('home', this)">✦ DASHBOARD</div>
+            <div class="nav-link" onclick="openPage('chars', this)">✦ CHARACTERS</div>
+            <div class="nav-link" onclick="openPage('gallery', this)">✦ GALLERY</div>
+            <div class="nav-link" onclick="openPage('memo', this)">✦ ARCHIVE</div>
+        </nav>
+
+        <div style="margin-top: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 11px;">
+            <b>System Log:</b><br>
+            All systems functional.<br>
+            Loading universe...
         </div>
     </aside>
 
-    <main class="main-frame">
-        <article class="content-layout">
-            <h1 id="p-title" class="page-title">Loading...</h1>
-            
-            <div id="p-properties" class="property-container">
-                </div>
-
-            <div class="divider"></div>
-
-            <section id="p-content" class="body-section">
-                </section>
-        </article>
-    </main>
-
-<script>
-    /**
-     * 💾 DATABASE: 모든 하위 페이지 데이터 통합 관리
-     * 새로운 캐릭터를 추가하고 싶다면 아래 대괄호 [ ] 안에 형식을 맞춰 추가만 하세요.
-     */
-    const ARCHIVE_DB = {
-        "home": {
-            title: "Project: Character Archive",
-            properties: { "상태": "운영 중", "제작자": "Sun-phil", "최근 업데이트": "2026-04-18" },
-            content: `
-                <div class="callout">
-                    <span>💡</span>
-                    <div>
-                        이곳은 저의 소중한 오리지널 캐릭터들을 기록하는 개인 데이터베이스입니다. 
-                        왼쪽 사이드바에서 원하는 캐릭터를 선택하여 상세 설정을 열람할 수 있습니다.
+    <main class="viewport">
+        
+        <section id="page-home" class="page active" style="grid-column: span 3;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div class="glass-panel">
+                    <h2>WELCOME MESSAGE</h2>
+                    <p>이곳은 저의 개인적인 우주입니다. 다양한 캐릭터와 설정들을 보관하고 있습니다.</p>
+                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border-left: 4px solid var(--accent);">
+                        <b>Notice:</b> 현재 새로운 자캐 '루나'의 서사가 업데이트 되었습니다.
                     </div>
                 </div>
-                <h3>시스템 가이드</h3>
-                <ul>
-                    <li><b>Identity:</b> 캐릭터의 핵심 키워드를 나타냅니다.</li>
-                    <li><b>Details:</b> 외양 및 세부 스펙을 기록합니다.</li>
-                    <li><b>Story:</b> 캐릭터의 과거사와 서사를 서술합니다.</li>
-                </ul>
-            `
-        },
-        "char_01": {
-            title: "선필 (Sun-phil)",
-            properties: { 
-                "나이": "20세", 
-                "소속": "아카이브 시스템", 
-                "성격": "<span class='tag'>총명함</span> <span class='tag'>철저함</span>",
-                "MBTI": "INTJ"
-            },
-            content: `
-                <h3>Overview</h3>
-                이 시스템의 관리자이자 제작자입니다. 깔끔하고 효율적인 것을 지향하며, 
-                애플(Apple)의 미니멀리즘 디자인과 노션(Notion)의 체계적인 구조를 좋아합니다.
-
-                <h3>Background</h3>
-                어느 날 복잡한 캐릭터 설정을 한눈에 보기 위해 이 깃허브 페이지를 구축하기 시작했습니다. 
-                모든 데이터는 실시간으로 연동되며, 복잡한 하위 페이지 구성을 단일 파일로 해결하는 기술을 보유하고 있습니다.
-
-                <div class="callout" style="background:#e7f3f8">
-                    ℹ️ <b>Tip:</b> 본문에는 HTML 코드를 섞어 써서 사진이나 표를 마음껏 넣을 수 있습니다.
+                <div class="glass-panel">
+                    <h2>STATUS</h2>
+                    <div class="status-label">CREATIVITY</div>
+                    <div class="status-bar"><div class="status-fill" style="width: 85%;"></div></div>
+                    <div class="status-label">PRODUCTIVITY</div>
+                    <div class="status-bar"><div class="status-fill" style="width: 40%;"></div></div>
+                    <div style="margin-top: 15px; font-size: 13px; text-align: center;">"오늘의 기분: 반짝임"</div>
                 </div>
-            `
-        },
-        "char_02": {
-            title: "예시 캐릭터 A",
-            properties: { 
-                "나이": "18세", 
-                "종족": "인간", 
-                "능력": "<span class='tag'>시간 조절</span>",
-                "위험도": "★★★☆☆"
-            },
-            content: `
-                <h3>캐릭터 설정</h3>
-                이곳에 캐릭터의 상세 설정을 마음껏 적으세요. 장문으로 길게 적어도 스크롤이 자동으로 생기기 때문에 
-                노션 페이지를 읽는 것과 똑같은 경험을 줍니다.
+            </div>
+        </section>
 
-                <h3>관계도</h3>
-                - <b>선필:</b> 조력자 관계
-                - <b>미확인 캐릭터:</b> 적대적 관계
-            `
+        <section id="page-chars" class="page" style="grid-column: span 3;">
+            <div class="glass-panel">
+                <h2>CHARACTER LIST</h2>
+                <div class="character-grid">
+                    <div class="char-card">
+                        <div style="height: 120px; background: #444; border-radius: 10px; margin-bottom: 10px;"></div>
+                        <b>선필 (Sun-phil)</b><br><span style="font-size: 12px; opacity:0.6;">Admin / 20y</span>
+                    </div>
+                    <div class="char-card">
+                        <div style="height: 120px; background: #444; border-radius: 10px; margin-bottom: 10px;"></div>
+                        <b>캐릭터 A</b><br><span style="font-size: 12px; opacity:0.6;">Fighter / 18y</span>
+                    </div>
+                    <div class="char-card">
+                        <div style="height: 120px; background: #444; border-radius: 10px; margin-bottom: 10px;"></div>
+                        <b>캐릭터 B</b><br><span style="font-size: 12px; opacity:0.6;">Mage / ??y</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-gallery" class="page" style="grid-column: span 3;">
+            <div class="glass-panel">
+                <h2>ART GALLERY</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
+                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
+                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
+                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-memo" class="page" style="grid-column: span 3;">
+            <div class="glass-panel">
+                <h2>WORLD SETTING</h2>
+                <div style="white-space: pre-wrap; line-height: 1.8;">
+                    여기에 세계관 설정을 아주 길게 적으셔도 됩니다.
+                    자동으로 스크롤이 생성되며, 노션보다 훨씬 화려한 배경 위에서 설정을 감상할 수 있습니다.
+                    
+                    <b>[제 1장: 시작의 별]</b>
+                    태초에 별들이 흩어지며 어쩌구 저쩌구...
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // 1. 페이지 전환 함수
+        function openPage(pageId, element) {
+            // 모든 페이지 숨기기
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // 선택한 페이지 열기
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // 메뉴 스타일 변경
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            element.classList.add('active');
         }
-    };
 
-    /**
-     * ⚙️ SYSTEM LOGIC: 페이지 전환 및 렌더링
-     */
-    function loadPage(pageKey) {
-        const data = ARCHIVE_DB[pageKey];
-        if (!data) return;
-
-        // 1. 타이틀 업데이트
-        document.getElementById('p-title').innerText = data.title;
-        document.title = `${data.title} | Archive`;
-
-        // 2. 속성(Property) 테이블 생성
-        let propHtml = '';
-        for (const [key, val] of Object.entries(data.properties)) {
-            propHtml += `
-                <div class="prop-label"><span>🏷️</span>&nbsp;${key}</div>
-                <div class="prop-value">${val}</div>
-            `;
+        // 2. 테마 전환 함수
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
         }
-        document.getElementById('p-properties').innerHTML = propHtml;
-
-        // 3. 본문 렌더링
-        // \n(줄바꿈)을 <br>로 바꾸어 텍스트 형식을 유지함
-        document.getElementById('p-content').innerHTML = data.content.replace(/\n/g, '<br>');
-
-        // 4. 사이드바 활성 스타일 적용
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-            if(item.dataset.id === pageKey) item.classList.add('active');
-        });
-
-        // 5. 페이지 상단으로 스크롤 이동
-        document.querySelector('.main-frame').scrollTop = 0;
-    }
-
-    // 초기 사이드바 리스트 생성
-    const navContainer = document.getElementById('character-nav');
-    Object.keys(ARCHIVE_DB).forEach(key => {
-        if(key === 'home') return; // 홈은 따로 있으므로 제외
-        
-        const item = document.createElement('div');
-        item.className = 'nav-item';
-        item.dataset.id = key;
-        item.innerHTML = `<span class="nav-icon">📄</span> ${ARCHIVE_DB[key].title}`;
-        item.onclick = () => loadPage(key);
-        navContainer.appendChild(item);
-    });
-
-    // 첫 진입 시 홈 페이지 로드
-    window.onload = () => loadPage('home');
-</script>
-
+    </script>
 </body>
 </html>
