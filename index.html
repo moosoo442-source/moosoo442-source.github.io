@@ -3,241 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✧ MY ARCHIVE ✧</title>
+    <title>UNIVERSE: ARCHIVE</title>
     <style>
-        /* 1. 핵심 시스템: 테마별 변수 설정 */
-        :root[data-theme="fantasy"] {
-            --bg-img: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920');
-            --panel-bg: rgba(20, 20, 30, 0.7);
-            --accent: #e0b0ff; /* 연보라 */
-            --border: rgba(224, 176, 255, 0.4);
-            --text: #fff;
+        /* 1. 기본 셋팅: 폰트 및 배경 */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Noto+Sans+KR:wght@300;500;700&display=swap');
+
+        :root {
+            --accent: #ff007a;
+            --sub-accent: #00f3ff;
+            --bg-overlay: rgba(10, 10, 15, 0.85);
+            --border: rgba(255, 255, 255, 0.15);
         }
 
-        :root[data-theme="cyber"] {
-            --bg-img: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1920');
-            --panel-bg: rgba(0, 5, 10, 0.85);
-            --accent: #00f3ff; /* 사이언 */
-            --border: #00f3ff;
-            --text: #00f3ff;
+        * { box-sizing: border-box; cursor: crosshair; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background: #000;
+            color: #fff; font-family: 'Noto Sans KR', sans-serif;
         }
 
-        :root[data-theme="decora"] {
-            --bg-img: url('https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=1920');
-            --panel-bg: rgba(255, 255, 255, 0.8);
-            --accent: #ff007a; /* 핫핑크 */
-            --border: #ff007a;
-            --text: #333;
+        /* 2. 전면 배경 (참고 이미지 같은 몽환적 느낌) */
+        .bg-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1533134486753-c833f0ed4866?q=80&w=1920') no-repeat center/cover;
+            filter: brightness(0.6) saturate(1.2);
+            z-index: -2;
+        }
+        .bg-noise {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
+            opacity: 0.2; z-index: -1;
         }
 
-        /* 2. 베이스 레이아웃 */
-        body {
-            margin: 0; padding: 0; height: 100vh;
-            background: var(--bg-img) no-repeat center center fixed;
-            background-size: cover;
-            color: var(--text);
-            font-family: 'Apple SD Gothic Neo', sans-serif;
-            display: flex; overflow: hidden;
-            transition: 0.5s ease-in-out;
+        /* 3. 상단 BGM 플레이어 위젯 */
+        .bgm-player {
+            position: fixed; top: 20px; right: 40px;
+            background: var(--bg-overlay); padding: 10px 20px;
+            border: 1px solid var(--border); border-radius: 50px;
+            display: flex; align-items: center; gap: 15px; font-size: 12px;
+            backdrop-filter: blur(10px); z-index: 1000;
+        }
+        .play-bar { width: 100px; height: 2px; background: rgba(255,255,255,0.2); position: relative; }
+        .play-fill { position: absolute; left: 0; top: 0; height: 100%; width: 45%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+        /* 4. 메인 프레임 (좌측 메뉴 + 우측 본문) */
+        .frame {
+            display: flex; width: 92vw; height: 85vh; margin: 7.5vh auto;
+            border: 1px solid var(--border); background: var(--bg-overlay);
+            backdrop-filter: blur(20px); border-radius: 5px; overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        /* 3. 사이드바 (데코라 디자인) */
-        .sidebar {
-            width: 260px; height: 94vh; margin: 3vh 0 3vh 30px;
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            display: flex; flex-direction: column; padding: 30px 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            z-index: 100;
+        /* 메뉴 (참고이미지의 수직 바 스타일) */
+        .menu-bar {
+            width: 80px; height: 100%; border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 40px; padding: 20px 0;
+        }
+        .menu-item {
+            writing-mode: vertical-lr; text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 800;
+            letter-spacing: 4px; color: rgba(255,255,255,0.4);
+            transition: 0.4s; cursor: pointer;
+        }
+        .menu-item:hover, .menu-item.active { color: var(--accent); text-shadow: 0 0 15px var(--accent); transform: scale(1.1); }
+
+        /* 본문 영역 */
+        .content-area { flex: 1; position: relative; overflow-y: auto; padding: 60px; }
+        .page { display: none; opacity: 0; transform: translateY(20px); transition: 0.6s ease-out; }
+        .page.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* 5. 타이포그래피 강조 디자인 */
+        .big-title { 
+            font-family: 'Montserrat', sans-serif; font-size: 8rem; font-weight: 900;
+            line-height: 0.8; margin: 0; opacity: 0.1; position: absolute;
+            top: -20px; left: -20px; pointer-events: none;
+        }
+        .section-header { font-size: 42px; font-weight: 900; margin-bottom: 40px; border-bottom: 5px solid var(--accent); display: inline-block; }
+
+        /* 캐릭터 카드 스타일 (과하고 예쁘게) */
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .card {
+            position: relative; height: 400px; border: 1px solid var(--border);
+            overflow: hidden; transition: 0.5s;
+        }
+        .card:hover { border-color: var(--sub-accent); transform: translateY(-10px); }
+        .card img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.5); transition: 0.5s; }
+        .card:hover img { filter: grayscale(0) scale(1.1); }
+        .card-info {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
         }
 
-        .owner-profile {
-            width: 100px; height: 100px; border-radius: 50%;
-            border: 3px solid var(--accent); margin: 0 auto 15px;
-            box-shadow: 0 0 10px var(--accent);
-            background: #eee;
+        /* 6. 효과음/애니메이션 요소 */
+        .scanline {
+            width: 100%; height: 100px; background: linear-gradient(0deg, rgba(0,243,255,0.05) 0%, transparent 100%);
+            position: absolute; top: 0; left: 0; animation: scan 4s linear infinite; pointer-events: none;
         }
-
-        .nav-link {
-            padding: 12px 20px; margin: 5px 0; border-radius: 15px;
-            cursor: pointer; font-weight: bold; font-size: 15px;
-            transition: 0.3s; border: 1px solid transparent;
-            text-align: center; list-style: none;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--accent);
-            color: var(--accent);
-            text-shadow: 0 0 5px var(--accent);
-        }
-
-        /* 4. 메인 콘텐츠 대시보드 */
-        .viewport {
-            flex-grow: 1; padding: 3vh 30px;
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: auto 1fr auto; gap: 20px;
-            overflow-y: auto;
-        }
-
-        .glass-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 20px; padding: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            animation: slideIn 0.6s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 5. 페이지 전환 시스템 */
-        .page { display: none; }
-        .page.active { display: block; }
-
-        /* 6. 컴포넌트 디자인 */
-        .theme-switcher {
-            display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
-        }
-        .theme-btn {
-            width: 25px; height: 25px; border-radius: 50%; border: 2px solid #fff; cursor: pointer;
-        }
-
-        .character-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;
-        }
-        .char-card {
-            background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px;
-            text-align: center; border: 1px solid var(--border); transition: 0.3s;
-        }
-        .char-card:hover { transform: scale(1.05); background: rgba(255,255,255,0.05); }
-
-        .status-bar { height: 10px; background: #333; border-radius: 5px; margin: 5px 0; overflow: hidden; }
-        .status-fill { height: 100%; background: var(--accent); transition: 1s; }
-
-        h2 { font-size: 24px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
+        @keyframes scan { 0% { top: -100px; } 100% { top: 100%; } }
     </style>
 </head>
-<body data-theme="fantasy">
+<body>
 
-    <aside class="sidebar">
-        <div class="owner-profile"></div>
-        <div style="text-align: center; margin-bottom: 20px;">
-            <div style="font-weight: bold; font-size: 18px;">SUN-PHIL</div>
-            <div style="font-size: 12px; opacity: 0.7;">Preemptive Victory</div>
-        </div>
+    <div class="bg-container"></div>
+    <div class="bg-noise"></div>
+    <div class="scanline"></div>
 
-        <div class="theme-switcher">
-            <div class="theme-btn" style="background: #e0b0ff;" onclick="setTheme('fantasy')"></div>
-            <div class="theme-btn" style="background: #00f3ff;" onclick="setTheme('cyber')"></div>
-            <div class="theme-btn" style="background: #ff007a;" onclick="setTheme('decora')"></div>
-        </div>
+    <div class="bgm-player">
+        <span>NOW PLAYING: <b>Night City - Lofi Mix</b></span>
+        <div class="play-bar"><div class="play-fill"></div></div>
+        <div style="font-size: 10px; color: var(--accent);">01:42 / 03:50</div>
+    </div>
 
-        <nav>
-            <div class="nav-link active" onclick="openPage('home', this)">✦ DASHBOARD</div>
-            <div class="nav-link" onclick="openPage('chars', this)">✦ CHARACTERS</div>
-            <div class="nav-link" onclick="openPage('gallery', this)">✦ GALLERY</div>
-            <div class="nav-link" onclick="openPage('memo', this)">✦ ARCHIVE</div>
+    <div class="frame">
+        <nav class="menu-bar">
+            <div class="menu-item active" onclick="nav('home', this)">Index</div>
+            <div class="menu-item" onclick="nav('profile', this)">Profile</div>
+            <div class="menu-item" onclick="nav('gallery', this)">Visual</div>
+            <div class="menu-item" onclick="nav('archive', this)">Archive</div>
         </nav>
 
-        <div style="margin-top: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 11px;">
-            <b>System Log:</b><br>
-            All systems functional.<br>
-            Loading universe...
-        </div>
-    </aside>
-
-    <main class="viewport">
-        
-        <section id="page-home" class="page active" style="grid-column: span 3;">
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-                <div class="glass-panel">
-                    <h2>WELCOME MESSAGE</h2>
-                    <p>이곳은 저의 개인적인 우주입니다. 다양한 캐릭터와 설정들을 보관하고 있습니다.</p>
-                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border-left: 4px solid var(--accent);">
-                        <b>Notice:</b> 현재 새로운 자캐 '루나'의 서사가 업데이트 되었습니다.
+        <main class="content-area">
+            
+            <section id="p-home" class="page active">
+                <h1 class="big-title">MAIN</h1>
+                <div class="section-header">SUNPHIL.SYS</div>
+                <div style="font-size: 18px; line-height: 1.8; max-width: 600px; font-weight: 300;">
+                    <p><b>SYSTEM INITIALIZED.</b></p>
+                    <p>당신의 모든 상상력과 캐릭터들이 숨 쉬는 개인 아카이브입니다. 이곳의 모든 설정은 실시간으로 기록되며, 무한한 확장을 목표로 합니다.</p>
+                    <div style="margin-top: 50px; border: 1px solid var(--accent); padding: 20px; color: var(--accent);">
+                        [RECENT LOG] 2026.04.18 - 하위 페이지 시스템 연동 완료.
                     </div>
                 </div>
-                <div class="glass-panel">
-                    <h2>STATUS</h2>
-                    <div class="status-label">CREATIVITY</div>
-                    <div class="status-bar"><div class="status-fill" style="width: 85%;"></div></div>
-                    <div class="status-label">PRODUCTIVITY</div>
-                    <div class="status-bar"><div class="status-fill" style="width: 40%;"></div></div>
-                    <div style="margin-top: 15px; font-size: 13px; text-align: center;">"오늘의 기분: 반짝임"</div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="page-chars" class="page" style="grid-column: span 3;">
-            <div class="glass-panel">
-                <h2>CHARACTER LIST</h2>
-                <div class="character-grid">
-                    <div class="char-card">
-                        <div style="height: 120px; background: #444; border-radius: 10px; margin-bottom: 10px;"></div>
-                        <b>선필 (Sun-phil)</b><br><span style="font-size: 12px; opacity:0.6;">Admin / 20y</span>
+            <section id="p-profile" class="page">
+                <h1 class="big-title">CHAR</h1>
+                <div class="section-header">IDENTITY</div>
+                <div class="grid-layout">
+                    <div class="card" onclick="alert('캐릭터 상세 페이지로 이동(준비중)')">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600">
+                        <div class="card-info">
+                            <div style="color: var(--accent); font-size: 11px;">#001</div>
+                            <div style="font-size: 24px; font-weight: 900;">MOOSOO</div>
+                        </div>
                     </div>
-                    <div class="char-card">
-                        <div style="height: 120px; background: #444; border-radius: 10px; margin-bottom: 10px;"></div>
-                        <b>캐릭터 A</b><br><span style="font-size: 12px; opacity:0.6;">Fighter / 18y</span>
-                    </div>
-                    <div class="char-card">
-                        <div style="height: 120px; background: #444; border-radius: 10px; margin-bottom: 10px;"></div>
-                        <b>캐릭터 B</b><br><span style="font-size: 12px; opacity:0.6;">Mage / ??y</span>
+                    <div class="card">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600">
+                        <div class="card-info">
+                            <div style="color: var(--accent); font-size: 11px;">#002</div>
+                            <div style="font-size: 24px; font-weight: 900;">SUNPHIL</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="page-gallery" class="page" style="grid-column: span 3;">
-            <div class="glass-panel">
-                <h2>ART GALLERY</h2>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
-                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
-                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
-                    <div style="aspect-ratio: 1/1; background: rgba(255,255,255,0.1); border-radius: 10px;"></div>
+            <section id="p-gallery" class="page">
+                <h1 class="big-title">GALLERY</h1>
+                <div class="section-header">VISUALS</div>
+                <div style="columns: 3; gap: 20px;">
+                    <div style="background: rgba(255,255,255,0.05); height: 200px; margin-bottom: 20px; border: 1px solid var(--border);"></div>
+                    <div style="background: rgba(255,255,255,0.05); height: 350px; margin-bottom: 20px; border: 1px solid var(--border);"></div>
+                    <div style="background: rgba(255,255,255,0.05); height: 250px; margin-bottom: 20px; border: 1px solid var(--border);"></div>
+                    <div style="background: rgba(255,255,255,0.05); height: 300px; margin-bottom: 20px; border: 1px solid var(--border);"></div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="page-memo" class="page" style="grid-column: span 3;">
-            <div class="glass-panel">
-                <h2>WORLD SETTING</h2>
-                <div style="white-space: pre-wrap; line-height: 1.8;">
-                    여기에 세계관 설정을 아주 길게 적으셔도 됩니다.
-                    자동으로 스크롤이 생성되며, 노션보다 훨씬 화려한 배경 위에서 설정을 감상할 수 있습니다.
-                    
-                    <b>[제 1장: 시작의 별]</b>
-                    태초에 별들이 흩어지며 어쩌구 저쩌구...
+            <section id="p-archive" class="page">
+                <h1 class="big-title">DOCS</h1>
+                <div class="section-header">RECORDS</div>
+                <div style="font-size: 15px; line-height: 2; color: #ccc;">
+                    <h3>[ 세계관 설정: 제 0구역 ]</h3>
+                    이곳은 당신이 원하는 모든 텍스트를 담을 수 있는 공간입니다. 
+                    장문의 서사를 적어도 폰트와 행간이 미적으로 설계되어 있어 가독성이 뛰어납니다. <br><br>
+                    ...여기에 수천 줄의 설정을 적어 넣으세요...
                 </div>
-            </div>
-        </section>
+            </section>
 
-    </main>
+        </main>
+    </div>
+
+    <audio id="bgm" src="YOUR_MUSIC_URL.mp3" loop></audio>
 
     <script>
-        // 1. 페이지 전환 함수
-        function openPage(pageId, element) {
+        // 1. 하위 페이지 전환 (부드러운 애니메이션 적용)
+        function nav(pageId, btn) {
+            // 모든 메뉴 비활성화
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            btn.classList.add('active');
+
             // 모든 페이지 숨기기
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // 선택한 페이지 열기
-            document.getElementById('page-' + pageId).classList.add('active');
             
-            // 메뉴 스타일 변경
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            element.classList.add('active');
+            // 약간의 딜레이 후 페이지 보여주기 (효과 극대화)
+            setTimeout(() => {
+                const target = document.getElementById('p-' + pageId);
+                target.classList.add('active');
+            }, 100);
         }
 
-        // 2. 테마 전환 함수
-        function setTheme(themeName) {
-            document.documentElement.setAttribute('data-theme', themeName);
-        }
+        // 2. 마우스 클릭 시 효과음 처리 (옵션)
+        document.addEventListener('click', () => {
+            const audio = document.getElementById('bgm');
+            // 브라우저 정책상 사용자 클릭 후 재생 가능
+            // audio.play().catch(e => console.log("자동 재생 대기 중"));
+        });
     </script>
 </body>
 </html>
