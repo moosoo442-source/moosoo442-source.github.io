@@ -3,320 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GAMA | CENTRAL DATABASE v4.5</title>
+    <title>GAMA | GOVERNMENT ABILITY MANAGEMENT AGENCY</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
 
         :root {
             --primary: #00f2ff;
-            --primary-dim: rgba(0, 242, 255, 0.15);
+            --secondary: #00828a;
             --danger: #ff3e3e;
-            --warning: #ffcc00;
-            --bg-dark: #050508;
-            --panel-bg: rgba(15, 15, 20, 0.98);
-            --border: rgba(0, 242, 255, 0.25);
+            --warning: #ffb700;
+            --bg-dark: #050507;
+            --panel-bg: rgba(20, 20, 25, 0.95);
+            --border: rgba(0, 242, 255, 0.3);
             --font-sys: 'Orbitron', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-            --sidebar-width: 300px;
+            --sidebar-width: 280px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             background-color: var(--bg-dark);
-            color: #d1d1d1;
+            color: #d0d0d5;
             font-family: 'Noto Sans KR', sans-serif;
             overflow: hidden;
             height: 100vh;
         }
 
-        /* [Visual Effects] */
+        /* [배경] 노이즈 및 스캔라인 효과 */
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px; z-index: 5000; pointer-events: none; opacity: 0.4;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 2px 100%; z-index: 2000; pointer-events: none;
         }
 
-        .crt-flicker {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(18, 16, 16, 0.02); z-index: 4999; pointer-events: none;
-            animation: flicker 0.15s infinite;
-        }
-        @keyframes flicker { 0% { opacity: 0.1; } 50% { opacity: 0.2; } 100% { opacity: 0.1; } }
-
-        /* [Layout] */
+        /* [레이아웃] */
         .wrapper { display: flex; height: 100vh; width: 100vw; }
 
-        /* [Sidebar] */
+        /* [PC/태블릿 가로] 사이드바 */
         nav {
-            width: var(--sidebar-width);
-            background: #08080c;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            z-index: 1500;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            width: var(--sidebar-width); background: #0a0a0f; border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; z-index: 1500;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .logo-area { padding: 50px 30px; border-bottom: 1px solid var(--border); }
-        .logo-area h1 { font-family: var(--font-sys); color: var(--primary); font-size: 1.4rem; letter-spacing: 4px; text-shadow: 0 0 10px var(--primary); }
-        .logo-area p { font-size: 0.6rem; color: #555; margin-top: 10px; letter-spacing: 1px; }
+        .logo-area { padding: 40px 30px; border-bottom: 1px solid rgba(0,242,255,0.1); }
+        .logo-area h1 { font-family: var(--font-sys); color: var(--primary); font-size: 1.4rem; letter-spacing: 3px; font-weight: 700; }
+        .logo-area span { font-size: 0.65rem; color: #555; letter-spacing: 1px; }
 
-        .nav-menu { list-style: none; flex: 1; padding: 30px 0; overflow-y: auto; }
+        .nav-menu { list-style: none; flex: 1; padding: 20px 0; }
         .nav-item {
-            padding: 20px 30px; cursor: pointer; color: #777; font-family: var(--font-sys);
-            font-size: 0.8rem; transition: 0.3s; display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 30px; cursor: pointer; color: #666; font-family: var(--font-sys);
+            font-size: 0.85rem; transition: 0.3s; display: flex; align-items: center; justify-content: space-between;
         }
-        .nav-item:hover, .nav-item.active { color: var(--primary); background: var(--primary-dim); }
-        .nav-item.active { border-right: 4px solid var(--primary); }
-        .nav-item::after { content: '>>'; opacity: 0; transition: 0.3s; font-size: 0.6rem; }
+        .nav-item:hover, .nav-item.active { color: var(--primary); background: rgba(0, 242, 255, 0.05); }
+        .nav-item::after { content: '→'; opacity: 0; transition: 0.3s; }
         .nav-item:hover::after, .nav-item.active::after { opacity: 1; transform: translateX(5px); }
 
-        /* [Main Content] */
-        main { flex: 1; overflow-y: auto; position: relative; padding: 80px 60px; scroll-behavior: smooth; }
+        /* [메인 컨텐츠] */
+        main { flex: 1; overflow-y: auto; position: relative; padding: 60px 8%; background: radial-gradient(circle at center, #101015 0%, #050507 100%); }
+        main::-webkit-scrollbar { width: 8px; }
+        main::-webkit-scrollbar-thumb { background: rgba(0, 242, 255, 0.3); border-radius: 4px; }
 
-        .page { display: none; max-width: 1100px; margin: 0 auto; animation: pageLoad 0.6s ease-out; }
+        .page { display: none; max-width: 1100px; margin: 0 auto; animation: slideIn 0.5s ease; }
         .page.active { display: block; }
-        @keyframes pageLoad { from { opacity: 0; filter: blur(10px); transform: translateY(20px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }
 
-        /* [Typography & Components] */
-        .section-header { margin-bottom: 60px; border-left: 5px solid var(--primary); padding-left: 25px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* [모바일] 상단 바 */
+        .mobile-top-bar {
+            display: none; position: fixed; top: 0; width: 100%; height: 60px;
+            background: #0a0a0f; border-bottom: 1px solid var(--border);
+            z-index: 1600; padding: 0 20px; align-items: center; justify-content: space-between;
+        }
+
+        /* [컴포넌트] */
+        .section-header { margin-bottom: 50px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
         .section-header h2 { font-family: var(--font-sys); font-size: 2.8rem; color: var(--primary); text-transform: uppercase; margin-bottom: 10px; }
-        .section-header p { color: #888; font-size: 1rem; }
-
-        .content-box { background: var(--panel-bg); border: 1px solid var(--border); padding: 40px; margin-bottom: 30px; position: relative; }
-        .content-box h3 { font-family: var(--font-sys); color: var(--primary); margin-bottom: 20px; font-size: 1.3rem; display: flex; align-items: center; }
-        .content-box h3::before { content: '■'; margin-right: 10px; font-size: 0.8rem; }
-        .content-box p { line-height: 1.8; margin-bottom: 15px; font-size: 0.95rem; color: #bbb; }
-
+        .section-header p { color: #888; font-size: 0.95rem; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
         .card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 35px;
-            position: relative; transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); cursor: pointer;
+            background: var(--panel-bg); border: 1px solid var(--border); padding: 35px;
+            position: relative; transition: 0.3s; cursor: pointer; border-radius: 4px;
         }
-        .card:hover { background: var(--primary-dim); transform: scale(1.02); border-color: var(--primary); }
+        .card:hover { border-color: var(--primary); box-shadow: 0 0 25px rgba(0, 242, 255, 0.15); transform: translateY(-5px); }
+        .card h3 { font-family: var(--font-sys); font-size: 1.3rem; margin-bottom: 15px; color: #fff; }
+        .card p { font-size: 0.95rem; color: #aaa; line-height: 1.7; word-break: keep-all; }
 
-        /* [Mobile Navigation] */
-        .mobile-top-bar {
-            display: none; position: fixed; top: 0; width: 100%; height: 65px;
-            background: #0a0a0f; border-bottom: 1px solid var(--border);
-            z-index: 2000; padding: 0 25px; align-items: center; justify-content: space-between;
-        }
-
-        /* [Detail Full-view] */
+        /* [캐릭터 상세뷰 - 전체화면] */
         .detail-view {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050508; z-index: 4000; display: none;
-            padding: 100px 15%; overflow-y: auto; animation: detailIn 0.4s ease;
+            background: rgba(5, 5, 7, 0.98); z-index: 3000; display: none;
+            padding: 80px 15%; overflow-y: auto; backdrop-filter: blur(10px);
         }
-        @keyframes detailIn { from { transform: scale(1.1); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .close-btn {
+        .close-detail {
             position: fixed; top: 40px; right: 50px; font-family: var(--font-sys);
-            color: var(--primary); cursor: pointer; font-size: 0.9rem; padding: 12px 25px;
-            border: 1px solid var(--primary); transition: 0.3s; z-index: 4100;
+            color: var(--primary); cursor: pointer; font-size: 1rem; z-index: 3100;
+            padding: 12px 25px; border: 1px solid var(--primary); background: rgba(0,0,0,0.5);
+            transition: 0.3s; letter-spacing: 1px;
         }
-        .close-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
+        .close-detail:hover { background: var(--primary); color: #000; }
 
-        /* [Special Classes] */
-        .accent { color: var(--primary); font-weight: bold; }
-        .danger-text { color: var(--danger); font-weight: bold; }
-        .tag { font-family: var(--font-sys); font-size: 0.7rem; padding: 3px 10px; border: 1px solid currentColor; margin-bottom: 15px; display: inline-block; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 10px; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .content-block { margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 30px; border-left: 2px solid var(--secondary); line-height: 1.8; }
+        .content-block h4 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; }
 
-        /* [Responsive] */
+        /* [기기별 대응] */
         @media (max-width: 1024px) {
-            main { padding: 60px 30px; }
-            .detail-view { padding: 80px 5%; }
+            main { padding: 40px 5%; }
+            .section-header h2 { font-size: 2.2rem; }
+            .detail-view { padding: 80px 8%; }
         }
+
         @media (max-width: 768px) {
             .mobile-top-bar { display: flex; }
-            nav { position: fixed; left: -100%; top: 65px; height: calc(100vh - 65px); width: 100%; }
-            nav.open { left: 0; }
-            main { padding: 110px 20px 80px; }
-            .section-header h2 { font-size: 2rem; }
+            nav {
+                position: fixed; left: 0; top: 60px; width: 100%; height: calc(100vh - 60px);
+                transform: translateY(-120%);
+            }
+            nav.open { transform: translateY(0); }
+            main { padding: 100px 20px 60px; }
             .grid { grid-template-columns: 1fr; }
+            .close-detail { top: 20px; right: 20px; padding: 8px 15px; font-size: 0.8rem; }
+            .detail-view { padding: 80px 20px 40px; }
         }
+        
+        /* 유틸리티 */
+        .accent { color: var(--primary); font-weight: bold; }
+        .danger-text { color: var(--danger); font-weight: bold; }
+        .tag { display: inline-block; padding: 4px 10px; border: 1px solid var(--primary); font-size: 0.7rem; margin-bottom: 15px; font-family: var(--font-sys); letter-spacing: 1px; }
+        .tag.s-rank { border-color: var(--warning); color: var(--warning); }
+        .tag.danger { border-color: var(--danger); color: var(--danger); }
     </style>
 </head>
 <body>
 
 <div class="scanlines"></div>
-<div class="crt-flicker"></div>
 
 <header class="mobile-top-bar">
-    <div style="font-family: var(--font-sys); color: var(--primary); font-size: 1rem; letter-spacing: 2px;">GAMA CORE</div>
-    <button id="menu-btn" onclick="toggleMenu()" style="background:none; border:none; color:var(--primary); font-size:1.8rem; cursor:pointer;">☰</button>
+    <div style="font-family: var(--font-sys); color: var(--primary); font-size: 1rem; font-weight: bold;">GAMA OS</div>
+    <button id="menu-btn" onclick="toggleMenu()" style="background:none; border:none; color:var(--primary); font-size:1.5rem; cursor:pointer;">☰</button>
 </header>
 
 <div class="wrapper">
     <nav id="sidebar">
         <div class="logo-area">
             <h1>G.A.M.A</h1>
-            <p>GOVERNMENT ABILITY MANAGEMENT AGENCY</p>
+            <span>GOV. ABILITY MGMT AGENCY</span>
         </div>
         <ul class="nav-menu">
-            <li class="nav-item active" onclick="navTo('home')">OVERVIEW</li>
-            <li class="nav-item" onclick="navTo('history')">HISTORY & WORLD</li>
-            <li class="nav-item" onclick="navTo('ranks')">RANKING SYSTEM</li>
-            <li class="nav-item" onclick="navTo('personnel')">PERSONNEL FILES</li>
-            <li class="nav-item" onclick="navTo('danger')">DANGER ZONES</li>
-            <li class="nav-item" onclick="alert('ACCESS DENIED: LEVEL 5 REQUIRED')">SYSTEM LOGS</li>
+            <li class="nav-item active" onclick="navTo('home')">DASHBOARD</li>
+            <li class="nav-item" onclick="navTo('world')">WORLD VIEW</li>
+            <li class="nav-item" onclick="navTo('chars')">PERSONNEL</li>
+            <li class="nav-item" onclick="navTo('docs')">ARCHIVES</li>
         </ul>
-        <div style="padding: 30px; border-top: 1px solid rgba(255,255,255,0.05);">
-            <div id="clock" style="font-family: var(--font-code); font-size: 0.75rem; color: var(--primary);"></div>
+        <div style="padding: 20px; font-size: 0.65rem; color: #555; font-family: var(--font-sys); line-height: 1.8;">
+            USER: ADMIN_SEOUL<br>
+            AUTH: LEVEL 5 (OVERSEER)<br>
+            STATUS: ENCRYPTED
         </div>
     </nav>
 
     <main>
         <section id="home" class="page active">
             <div class="section-header">
-                <h2>Operational Overview</h2>
-                <p>중앙 관리국 실시간 운영 현황 보고서</p>
-            </div>
-            <div class="content-box">
-                <h3>시스템 접속 프로토콜</h3>
-                <p>현재 당신은 <span class="accent">Level 4 관리자 권한</span>으로 접속 중입니다. 모든 열람 기록은 중앙 서버에 저장되며, 외부 유출 시 국가보안법에 의해 처벌받을 수 있습니다.</p>
-                <p>2026년 4월 21일 기준, 전국 각성자 등록률은 <span class="accent">98.4%</span>를 돌파했습니다. 미등록 각성자(언레지스터드)에 대한 추적 작업이 진행 중입니다.</p>
+                <h2>Dashboard</h2>
+                <p>실시간 관제 시스템 및 주요 보안 알림 (Last Update: 2026.04.21)</p>
             </div>
             <div class="grid">
-                <div class="card">
-                    <div class="tag" style="color:var(--primary);">LIVE STATUS</div>
-                    <h3>관제 현황</h3>
-                    <p>현재 서울 내 '대균열' 안정도: <span class="accent">94%</span><br>특이 에너지 파동 감지 없음.</p>
+                <div class="card" style="grid-column: 1 / -1; border-left: 4px solid var(--primary); background: rgba(0, 242, 255, 0.03);">
+                    <div class="tag">SYSTEM STATUS: STABLE</div>
+                    <h3 style="color: var(--primary);">[공지] 제3구역 대균열 잔여 에너지 안정화 완료</h3>
+                    <p>지난주 발생했던 국지적 차원 왜곡 현상이 GAMA 전술 1팀의 투입으로 완전히 제압되었습니다. 현재 서울 및 수도권 일대의 '이변(Anomaly)' 수치는 0.02%로 통제선 내에 머물고 있습니다. 모든 현장 요원들은 각인된 정신 보호 구구를 반드시 착용 후 대기해 주십시오.</p>
                 </div>
-                <div class="card" onclick="navTo('personnel')">
-                    <div class="tag" style="color:var(--warning);">URGENT</div>
-                    <h3>인사 알림</h3>
-                    <p>S급 요원 '한시우'의 등급 재심사가 예정되어 있습니다. 자료를 확인하십시오. →</p>
+                <div class="card" onclick="navTo('chars')">
+                    <div class="tag danger">ALERT: HIGH RISK</div>
+                    <h3>신규 S급 개체 등록</h3>
+                    <p>미등록 상태였던 고위험군 능력자의 신병이 확보되었습니다. 심리 상태가 극도로 불안정하므로 열람 시 보안 등급에 유의하십시오. <span class="accent">상세 프로필 보기 →</span></p>
+                </div>
+                <div class="card" onclick="navTo('world')">
+                    <div class="tag">UPDATE</div>
+                    <h3>운영 지침 개정판 배포</h3>
+                    <p>각성자들의 '성장(Coming of age)'에 따른 심리적 붕괴 현상, 일명 '개화 증후군'에 대한 새로운 관리 매뉴얼이 업데이트되었습니다.</p>
                 </div>
             </div>
         </section>
 
-        <section id="history" class="page">
+        <section id="world" class="page">
             <div class="section-header">
-                <h2>History & World</h2>
-                <p>대변혁의 시대, 그리고 기록된 역사</p>
+                <h2>World View</h2>
+                <p>GAMA 운영 지침 및 세계관 기밀 자료 열람</p>
             </div>
-            <div class="content-box">
-                <h3>01. 대균열 사건 (The Great Rift)</h3>
-                <p>2026년 초, 전 세계의 하늘이 보랏빛으로 물들며 차원의 틈새가 발생했습니다. 이 사건을 통해 유입된 '에테르' 에너지는 인류의 DNA를 근본적으로 변화시켰으며, 이를 <span class="accent">'각성'</span>이라 칭합니다.</p>
-                <p>초기 혼란기 동안 발생한 수많은 인명 피해를 막기 위해 대한민국 정부는 즉각적으로 <span class="danger-text">GAMA</span>를 창설하고 질서 유지에 나섰습니다.</p>
+            
+            <div class="content-block">
+                <h4>[ 이변의 서막 : 대균열과 각성 ]</h4>
+                <p>
+                    2026년 어느 날, 하늘이 찢어지는 듯한 굉음과 함께 지구 전역에 '대균열(The Great Rift)'이 발생했다. 물리적 피해는 전무했으나, 그날 이후 인류의 약 0.1%가 상식을 벗어난 이능(異能)을 발현하기 시작했다.<br><br>
+                    하지만 이 능력은 축복이 아니었다. 연구 결과, 능력의 발현은 개인의 <b>'극심한 심리적 결핍'</b>이나 <b>'성장에 대한 원초적인 공포'</b>를 매개로 이루어진다는 것이 밝혀졌다. 어른이 되는 것을 극도로 두려워하거나, 현실의 중압감에 짓눌려 자아가 파괴되기 직전의 소년 소녀들이 주로 끔찍한 괴물 혹은 초월적인 능력자로 각성했다.
+                </p>
             </div>
-            <div class="content-box">
-                <h3>02. 관리국의 역할</h3>
-                <p>GAMA는 각성자들의 능력을 측정하고 사회에 도움이 되는 방향으로 인도합니다. 또한, 통제되지 않는 '빌런' 개체와 차원의 틈에서 넘어온 '이형 존재'를 격퇴하는 국가의 최후 보루입니다.</p>
-            </div>
-        </section>
 
-        <section id="ranks" class="page">
-            <div class="section-header">
-                <h2>Ranking System</h2>
-                <p>초월적 힘의 척도와 등급 분류</p>
+            <div class="content-block">
+                <h4>[ GAMA : 정부 산하 능력자 관리국 ]</h4>
+                <p>
+                    각성자들의 폭주로 인한 사회적 혼란을 막기 위해 정부는 비밀리에 GAMA(Government Ability Management Agency)를 설립했다.<br><br>
+                    표면적으로는 능력자들을 보호하고 교육하는 기관이지만, 실체는 언제 터질지 모르는 <b>'걸어 다니는 시한폭탄'</b>들을 격리하고 감시하는 수용소에 가깝다. 요원들은 동족인 능력자들을 사냥하며, 능력을 사용할수록 침식되는 정신을 약물로 버티며 하루하루를 살아간다.
+                </p>
             </div>
-            <div class="grid">
+
+            <div class="grid" style="margin-top: 40px;">
                 <div class="card">
-                    <div class="tag" style="color:#ff3333; border-color:#ff3333;">RANK S</div>
-                    <h3>국가 전략급</h3>
-                    <p>단독으로 도시 하나를 파괴하거나 구제할 수 있는 화력을 보유한 개체입니다. 전 세계 100명 미만 존재.</p>
+                    <h3 style="color: var(--danger);">침식도 (Erosion Level)</h3>
+                    <p>능력을 무리하게 사용할수록 각성자의 정신이 '이면'의 존재에게 잠식당하는 수치. 침식도가 100%에 달하면 인간의 이성을 잃고 처단 대상인 '변이체'로 전락한다.</p>
                 </div>
                 <div class="card">
-                    <div class="tag" style="color:#ffcc00; border-color:#ffcc00;">RANK A</div>
-                    <h3>전술 핵심급</h3>
-                    <p>군 부대 하나와 맞먹는 전투력을 보유하며, 주요 작전의 지휘관 역할을 수행합니다.</p>
-                </div>
-                <div class="card">
-                    <div class="tag" style="color:#00f2ff; border-color:#00f2ff;">RANK B-C</div>
-                    <h3>현장 실무급</h3>
-                    <p>대부분의 현역 요원들이 속한 등급으로, 특정 분야에서 뛰어난 보조 능력을 발휘합니다.</p>
+                    <h3 style="color: var(--warning);">개화 증후군</h3>
+                    <p>주로 미성년 각성자들에게 나타나는 현상. 육체적, 정신적으로 '성장'해야만 하는 상황에 직면했을 때, 이를 거부하는 심리가 폭주하여 능력이 통제 불능 상태가 되는 것을 뜻한다.</p>
                 </div>
             </div>
         </section>
 
-        <section id="personnel" class="page">
+        <section id="chars" class="page">
             <div class="section-header">
                 <h2>Personnel Files</h2>
-                <p>등록된 주요 능력자 기밀 프로필</p>
+                <p>등록된 특수 관리 대상자 및 현장 요원 프로필</p>
             </div>
             <div class="grid">
-                <div class="card" onclick="openDetail('한시우 (Han Si-woo)', 'S-RANK / PSYCHOKINESIS', '서울 중앙 관리부 전술 1팀장. 차원 균열 발생 시 가장 먼저 현장에 투입되는 인물입니다. 냉철하고 과묵한 성격으로, 반경 1km 내의 모든 물체를 분자 단위로 제어할 수 있는 압도적인 염동력을 구사합니다. <br><br>특이사항: 과거 대균열 사건 당시 가족을 잃은 트라우마가 있으나 업무 효율성은 최상급임.')">
-                    <div class="tag" style="color:#ff3333;">S-RANK</div>
-                    <h3>한시우</h3>
-                    <p>능력: 절대 염동력<br>상세 정보 열람하기 →</p>
+                
+                <div class="card" onclick="openChar('서태혁 (Seo Tae-hyuk)', 'S-RANK / PHYSICAL MANIPULATION', 'GAMA 전술 1팀 팀장. 능글맞은 태도와 카사노바 기질로 유명하지만, 압도적인 무력으로 기관 내 서열 1위를 차지하고 있는 실력자.', charData1)">
+                    <div class="tag s-rank">RANK S</div>
+                    <h3>서태혁</h3>
+                    <p>분류: 현장 지휘관<br>주요 능력: 신체 지배 및 입자 가속</p>
                 </div>
-                <div class="card" onclick="openDetail('리아 (Ria)', 'A-RANK / HIGH-HEALER', '기관의 유일무이한 고위 치유사. 그녀의 능력인 [엔젤릭 세이비어]는 치명적인 외상뿐만 아니라 오염된 에테르 중독까지 정화할 수 있습니다. <br><br>특이사항: 비폭력 주의자로 전투 작전 시 최후방에서 대기하며 요원들의 생존율을 80% 이상 끌어올리는 대체 불가능한 자원입니다.')">
-                    <div class="tag" style="color:#ffcc00;">A-RANK</div>
-                    <h3>리아</h3>
-                    <p>능력: 성역의 가호<br>상세 정보 열람하기 →</p>
+
+                <div class="card" onclick="openChar('백설아 (Baek Seol-ah)', 'A-RANK / ILLUSION & MENTAL INTERFERENCE', '극심한 애정결핍과 집착 성향을 보이는 위험 개체. 환각을 통해 상대의 정신을 붕괴시키는 능력을 지녔다.', charData2)">
+                    <div class="tag danger">RANK A+ (위험군)</div>
+                    <h3>백설아</h3>
+                    <p>분류: 특수 격리 대상<br>주요 능력: 정신 간섭 (환각)</p>
                 </div>
-                <div class="card" onclick="openDetail('카일 (Kyle)', 'A-RANK / LIGHTNING BENDER', '자유분방한 성격의 속도광 요원. 번개의 속도로 이동하며 적을 섬멸합니다. 성격이 불 같아 팀원들과의 마찰이 잦지만, 실력만큼은 의심의 여지가 없습니다.')">
-                    <div class="tag" style="color:#ffcc00;">A-RANK</div>
-                    <h3>카일</h3>
-                    <p>능력: 전뇌 가속<br>상세 정보 열람하기 →</p>
+
+                <div class="card" onclick="openChar('류신 (Ryu Sin)', 'B-RANK / SONIC RESONANCE', '유명 아이돌 데뷔를 앞두고 각성하여 꿈이 좌절된 케이스. 목소리를 통해 물리적 타격을 주거나 감정을 조종한다.', charData3)">
+                    <div class="tag">RANK B</div>
+                    <h3>류신</h3>
+                    <p>분류: 정보 수집 및 교란<br>주요 능력: 음파 공명</p>
                 </div>
+
             </div>
         </section>
 
-        <section id="danger" class="page">
+        <section id="docs" class="page">
             <div class="section-header">
-                <h2>Danger Zones</h2>
-                <p>민간인 접근이 엄격히 금지된 구역</p>
+                <h2>Classified Archives</h2>
+                <p>보안 등급 5 이상의 인가자만 열람 가능합니다.</p>
             </div>
-            <div class="content-box" style="border-left: 4px solid var(--danger);">
-                <h3 class="danger-text">구역 13: 폐허가 된 강남역</h3>
-                <p>대균열 이후 에테르 농도가 가장 높은 지역으로, 다수의 '이형 존재'가 서식하고 있습니다. 현재 S급 요원 상주 하에 격리 중입니다.</p>
-            </div>
-            <div class="content-box" style="border-left: 4px solid var(--warning);">
-                <h3 style="color:var(--warning);">구역 07: 부유하는 섬</h3>
-                <p>중력 이상 현상이 발생한 지역입니다. 연구소 인원 외 출입 시 중력 압박으로 인한 사고 위험이 큽니다.</p>
+            
+            <div class="card" style="border: 1px dashed var(--danger); text-align: center; padding: 60px 20px;">
+                <h3 style="color: var(--danger); font-size: 2rem; margin-bottom: 20px;">ACCESS DENIED</h3>
+                <p style="margin-bottom: 30px; font-size: 1.1rem;">[기밀 문서 001: 대균열의 인위적 발생 가설 및 기관의 개입 여부]</p>
+                <p style="color: #666;">본 문서는 특수 암호화 처리가 되어 있습니다. <br>무단 해독 시도 시 요원의 위치가 추적되며 즉결 처분 대상이 될 수 있습니다.</p>
+                <button onclick="alert('경고: 접근 권한이 없습니다. 시스템 로그에 기록되었습니다.')" style="margin-top: 40px; background: rgba(255,0,0,0.1); border: 1px solid var(--danger); color: var(--danger); padding: 15px 40px; cursor: pointer; font-family: var(--font-sys); font-size: 1.1rem; letter-spacing: 2px; transition: 0.3s;">FORCE DECRYPT (위험)</button>
             </div>
         </section>
     </main>
 </div>
 
 <div id="detail-view" class="detail-view">
-    <div class="close-btn" onclick="closeDetail()">[ CLOSE_TERMINAL ]</div>
-    <div id="detail-inner">
-        <div class="tag" id="d-tag" style="color:var(--primary); border-color:var(--primary); font-size:1rem; padding:5px 15px;">RANKING</div>
-        <h1 id="d-name" style="font-family: var(--font-sys); color: var(--primary); font-size: 3.5rem; margin: 20px 0; letter-spacing: -1px;">Name</h1>
-        <h4 id="d-rank" style="font-family: var(--font-code); color: #666; margin-bottom: 50px; letter-spacing: 5px;">CLASS TYPE</h4>
-        <div style="background: rgba(255,255,255,0.03); padding: 40px; border: 1px solid rgba(255,255,255,0.05); line-height: 2; font-size: 1.1rem; color: #ddd;">
-            <p id="d-desc">상세 설명이 여기에 들어갑니다.</p>
+    <div class="close-detail" onclick="hideChar()">[ CLOSE ]</div>
+    
+    <div style="max-width: 900px; margin: 0 auto; background: var(--bg-dark); border: 1px solid var(--border); box-shadow: 0 0 40px rgba(0,0,0,0.8);">
+        <div style="padding: 50px; border-bottom: 1px solid rgba(255,255,255,0.05); background: linear-gradient(180deg, rgba(0,242,255,0.05) 0%, transparent 100%);">
+            <h1 id="d-name" style="font-family: var(--font-sys); color: #fff; font-size: 2.8rem; margin-bottom: 10px;">Name</h1>
+            <h3 id="d-rank" style="color: var(--primary); font-family: var(--font-sys); letter-spacing: 2px; font-size: 1.1rem;">RANK</h3>
         </div>
-        <div style="margin-top: 40px; font-family: var(--font-code); color: var(--primary); font-size: 0.8rem;">
-            [ ENCRYPTION KEY: GAMA-SECRET-2026-AUTO ]
+        
+        <div style="padding: 50px;">
+            <div class="content-block">
+                <h4>[ 요약 보고서 ]</h4>
+                <p id="d-summary" style="font-size: 1.05rem; color: #ccc;">Summary...</p>
+            </div>
+            
+            <div id="d-details">
+                </div>
         </div>
     </div>
 </div>
 
 <script>
-    // 1. Navigation System
-    function navTo(id) {
-        // All pages hide
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        // Target page show
-        const targetPage = document.getElementById(id);
-        if(targetPage) targetPage.classList.add('active');
+    /* [캐릭터 상세 데이터베이스 (Long-form 텍스트)] */
+    const charData1 = `
+        <div class="content-block">
+            <h4>[ 성향 및 특징 ]</h4>
+            <p>외견상으로는 값비싼 정장을 빼입고 다니는 한량, 일명 '제비'나 '카사노바'처럼 보인다. 매사 능글맞고 여유로우며 윗선의 명령도 기분 내키는 대로 무시하기 일쑤다. GAMA 내부에서도 그를 아니꼽게 보는 시선이 많지만, 그 누구도 그를 통제하지 못한다. 그는 서열주의가 만연한 이곳에서 언제나 다른 이들을 굽어보는 압도적인 <b>'포식자(Top)'</b>의 위치를 고수하고 있다.</p>
+        </div>
+        <div class="content-block">
+            <h4>[ 능력 : 신체 지배 및 입자 가속 (S급) ]</h4>
+            <p>자신을 포함한 타인의 신체 바이오리듬을 강제로 지배하고 조작할 수 있다. 심장 박동을 멈추게 하거나, 반대로 자신의 세포를 가속하여 초음속으로 움직이는 것도 가능하다. 그는 전투 시 마치 가벼운 왈츠를 추듯 적들을 유린하며, 피 한 방울 묻히지 않고 타겟을 제압하는 특유의 미학을 고집한다.</p>
+        </div>
+        <div class="content-block" style="border-left-color: var(--danger);">
+            <h4 style="color: var(--danger);">[ 특이 사항 / 경고 ]</h4>
+            <p>가벼운 언행 속에 지독할 정도의 냉혹함이 숨어 있다. 그는 동료가 죽어나가는 상황에서도 미소를 잃지 않는다. 그의 과거 기록은 기관 최고 등급으로 블라인드 처리되어 있으며, 그가 왜 GAMA라는 목줄을 스스로 차고 전술팀장 노릇을 하는지 아는 자는 국장뿐이다.</p>
+        </div>
+    `;
 
-        // Nav active state
+    const charData2 = `
+        <div class="content-block">
+            <h4>[ 성향 및 특징 ]</h4>
+            <p>겉보기엔 흠잡을 데 없이 인형처럼 예쁜 소녀지만, 내면은 심각하게 망가져 있다. 극심한 애정결핍과 버림받는 것에 대한 병적인 두려움(멘헤라 기질)을 앓고 있다. 자신에게 조금이라도 친절을 베푼 사람에게 비정상적으로 집착하며, 그 사람의 주위에 있는 다른 이들을 환각으로 미치게 만들어 배제하려 든다.</p>
+        </div>
+        <div class="content-block">
+            <h4>[ 능력 : 정신 간섭 및 시각적 환상 (A+급) ]</h4>
+            <p>상대방의 가장 큰 트라우마나 끔찍한 공포를 눈앞에 실체화시킨다. 백설아의 환각에 갇힌 자는 자신의 뇌가 만들어낸 공포에 짓눌려 스스로 목숨을 끊거나 식물인간이 된다. 물리적 파괴력은 없으나, 대인전(對人戰)에 있어서는 S급과 맞먹는 위험도를 지녔다.</p>
+        </div>
+        <div class="content-block" style="border-left-color: var(--danger);">
+            <h4 style="color: var(--danger);">[ 개화 증후군 진행 상태 ]</h4>
+            <p>각성 원인은 '어른들의 세계로 나아가는 것에 대한 극단적인 거부감'이었다. 그녀는 영원히 보호받는 '아이'로 남기 위해 무의식적으로 자신의 성장을 멈췄으며, 현재 침식도가 78%에 육박하여 수시로 정신 착란을 일으키고 있다. 절대 단독 면담을 금지한다.</p>
+        </div>
+    `;
+
+    const charData3 = `
+        <div class="content-block">
+            <h4>[ 성향 및 특징 ]</h4>
+            <p>대형 기획사의 유망한 보이그룹 데뷔조 센터였으나, 데뷔를 단 1주일 앞두고 대균열의 여파로 능력이 폭주하며 무대를 박살 냈다. 아이돌 시절의 미련을 버리지 못해 요원복 대신 무대 의상처럼 화려한 사복을 입고 다닌다. GAMA 내부의 비전투 요원들 사이에서 비밀리에 두터운 팬덤(팬카페 등)을 거느리고 있다.</p>
+        </div>
+        <div class="content-block">
+            <h4>[ 능력 : 음파 공명 (B급) ]</h4>
+            <p>목소리에 특정 주파수를 실어 타겟의 고막과 전정기관을 파괴하거나, 반대로 뇌파를 안정시키는 감정 조작이 가능하다. 주로 적의 시선을 끌어 모으거나 인질극 상황에서 사람들을 매료시켜 상황을 통제하는 조커 카드로 활용된다.</p>
+        </div>
+    `;
+
+    // 1. 페이지 네비게이션 함수
+    function navTo(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
-            // Simplified matching
-            if(item.getAttribute('onclick').includes(`'${id}'`)) {
-                item.classList.add('active');
-            }
+            if(item.innerText.toLowerCase().includes(id.slice(0,3))) item.classList.add('active');
         });
 
-        // Auto close mobile menu
+        // 모바일 스크롤 상단 이동 & 메뉴 닫기
+        document.querySelector('main').scrollTop = 0;
         if(window.innerWidth <= 768) {
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('menu-btn').innerText = '☰';
         }
-
-        // Scroll to top
-        document.querySelector('main').scrollTop = 0;
     }
 
-    // 2. Mobile Menu Toggle
+    // 2. 모바일 메뉴 토글
     function toggleMenu() {
         const sidebar = document.getElementById('sidebar');
         const btn = document.getElementById('menu-btn');
@@ -324,42 +357,28 @@
         btn.innerText = sidebar.classList.contains('open') ? '✕' : '☰';
     }
 
-    // 3. Personnel Detail View
-    function openDetail(name, rank, desc) {
+    // 3. 캐릭터 상세창 열기
+    function openChar(name, rank, summary, detailHTML) {
         document.getElementById('d-name').innerText = name;
         document.getElementById('d-rank').innerText = rank;
-        document.getElementById('d-desc').innerHTML = desc;
+        document.getElementById('d-summary').innerText = summary;
+        document.getElementById('d-details').innerHTML = detailHTML; // 롱폼 데이터 주입
         
-        // Rank tag color logic
-        const tag = document.getElementById('d-tag');
-        if(rank.includes('S-RANK')) tag.style.color = '#ff3333';
-        else if(rank.includes('A-RANK')) tag.style.color = '#ffcc00';
-        else tag.style.color = '#00f2ff';
-        tag.style.borderColor = tag.style.color;
-
-        document.getElementById('detail-view').style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Prevent scroll
+        const detailView = document.getElementById('detail-view');
+        detailView.style.display = 'block';
+        detailView.scrollTop = 0; // 열릴 때 항상 맨 위로
     }
 
-    function closeDetail() {
+    // 4. 캐릭터 상세창 닫기
+    function hideChar() {
         document.getElementById('detail-view').style.display = 'none';
-        document.body.style.overflow = 'auto';
     }
 
-    // 4. Real-time Clock
-    function updateClock() {
-        const now = new Date();
-        const dateStr = now.toISOString().split('T')[0];
-        const timeStr = now.toTimeString().split(' ')[0];
-        document.getElementById('clock').innerText = `DATE: ${dateStr} | TIME: ${timeStr} | STATUS: CONNECTED`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Window Resize Guard
+    // 5. 창 크기 변경 시 모바일 UI 초기화
     window.addEventListener('resize', () => {
         if(window.innerWidth > 768) {
             document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebar').style.transform = '';
         }
     });
 </script>
