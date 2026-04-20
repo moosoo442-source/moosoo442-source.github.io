@@ -2,328 +2,309 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENTRAL GOV. SYSTEM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CENTRAL GOV. SYSTEM | MULTI-SYNC</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap');
 
         :root {
-            --primary: #00f2ff; /* 시스템 사이언 */
+            --primary: #00f2ff;
             --danger: #ff3e3e;
             --bg-dark: #050507;
-            --panel-bg: rgba(20, 20, 25, 0.8);
+            --panel-bg: rgba(20, 20, 25, 0.9);
             --border: rgba(0, 242, 255, 0.3);
             --text-main: #e0e0e0;
             --font-sys: 'Orbitron', sans-serif;
+            --header-height: 60px;
+            --sidebar-width: 260px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        /* 초기화 및 기본 설정 */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Noto Sans KR', sans-serif;
-            overflow: hidden; /* 사이드바 고정 위해 */
+            overflow-x: hidden;
+            line-height: 1.5;
         }
 
-        /* 배경 글리치 효과 */
+        /* 배경 효과 - 모바일 성능 고려 오퍼시티 조절 */
         .bg-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 3px 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
             z-index: 1000;
             pointer-events: none;
+            opacity: 0.5;
         }
 
-        /* 메인 레이아웃 */
-        .wrapper { display: flex; height: 100vh; }
+        /* 전체 레이아웃 구조 */
+        .wrapper { display: flex; min-height: 100vh; flex-direction: row; }
+
+        /* 모바일 상단 바 (PC에서는 숨김) */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0; width: 100%; height: var(--header-height);
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            z-index: 1100;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            backdrop-filter: blur(10px);
+        }
 
         /* 사이드바 */
         nav {
-            width: 260px;
-            background: rgba(10, 10, 15, 0.95);
+            width: var(--sidebar-width);
+            background: rgba(10, 10, 15, 0.98);
             border-right: 1px solid var(--border);
-            padding: 30px 0;
+            padding: 40px 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
         }
 
-        .logo-area {
-            padding: 0 30px 40px;
-            text-align: center;
-        }
-
-        .logo-area h1 {
-            font-family: var(--font-sys);
-            font-size: 1.2rem;
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary);
-            letter-spacing: 2px;
-        }
+        .logo-area { padding: 0 30px 40px; text-align: left; }
+        .logo-area h1 { font-family: var(--font-sys); color: var(--primary); font-size: 1.1rem; letter-spacing: 2px; }
 
         .nav-menu { list-style: none; flex-grow: 1; }
         .nav-item {
-            padding: 15px 30px;
+            padding: 18px 30px;
             cursor: pointer;
-            transition: 0.3s;
-            color: #666;
+            transition: 0.2s;
+            color: #888;
             font-family: var(--font-sys);
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
+            font-size: 0.8rem;
             border-left: 3px solid transparent;
         }
+        .nav-item.active { color: var(--primary); background: rgba(0, 242, 255, 0.08); border-left-color: var(--primary); }
 
-        .nav-item:hover, .nav-item.active {
-            color: var(--primary);
-            background: rgba(0, 242, 255, 0.05);
-            border-left: 3px solid var(--primary);
-        }
-
-        /* 컨텐츠 영역 */
+        /* 메인 컨텐츠 */
         main {
-            flex-grow: 1;
-            padding: 60px;
-            overflow-y: auto;
-            position: relative;
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .page { display: none; animation: pageIn 0.4s ease; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
 
-        @keyframes pageIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2 {
-            font-family: var(--font-sys);
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            color: var(--primary);
-            border-bottom: 1px solid var(--border);
-            display: inline-block;
-            padding-bottom: 10px;
-        }
-
-        /* 카드 그리드 */
+        /* 그리드 시스템 최적화 */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .card {
             background: var(--panel-bg);
             border: 1px solid var(--border);
-            border-radius: 5px;
-            padding: 25px;
+            padding: 20px;
+            border-radius: 4px;
             transition: 0.3s;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
         }
+        .card:hover { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 242, 255, 0.15); }
 
-        .card:hover {
-            background: rgba(0, 242, 255, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .card h3 { margin-bottom: 10px; color: var(--primary); }
-        .card .tag { font-size: 0.7rem; color: var(--danger); font-weight: bold; margin-bottom: 15px; display: block; }
-
-        /* 캐릭터 상세 팝업 (모달) */
+        /* 모달 (반응형 대응) */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.85);
             z-index: 2000;
             display: none;
-            justify-content: center;
+            padding: 20px;
             align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
         }
-
         .modal-content {
-            width: 800px;
             background: var(--bg-dark);
             border: 1px solid var(--primary);
-            padding: 40px;
-            position: relative;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .close-btn {
-            position: absolute;
-            top: 20px; right: 20px;
-            color: var(--primary);
-            cursor: pointer;
-            font-family: var(--font-sys);
+        /* 미디어 쿼리: 태블릿 및 모바일 */
+        @media (max-width: 1024px) {
+            :root { --sidebar-width: 220px; }
+            main { padding: 30px; }
         }
 
-        /* 버튼 스타일 */
-        .btn {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 10px 20px;
-            cursor: pointer;
-            font-family: var(--font-sys);
-            font-size: 0.8rem;
-            transition: 0.3s;
+        @media (max-width: 768px) {
+            .mobile-header { display: flex; }
+            .wrapper { flex-direction: column; }
+            nav {
+                position: fixed;
+                left: 0; top: var(--header-height);
+                width: 100%;
+                height: calc(100vh - var(--header-height));
+                transform: translateX(-100%); /* 기본 숨김 */
+            }
+            nav.open { transform: translateX(0); }
+            main { padding: 80px 20px 40px; }
+            h2 { font-size: 1.8rem; }
+            .grid { grid-template-columns: 1fr; }
         }
 
-        .btn:hover { background: var(--primary); color: #000; }
+        /* 공통 버튼 */
+        .btn-menu {
+            background: none; border: none; color: var(--primary);
+            font-size: 1.5rem; cursor: pointer;
+        }
 
-        /* 하단 바 */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 260px; right: 0;
-            background: rgba(10, 10, 15, 0.9);
-            padding: 10px 30px;
-            border-top: 1px solid var(--border);
-            font-family: var(--font-sys);
-            font-size: 0.7rem;
-            color: var(--primary);
-            display: flex;
-            justify-content: space-between;
+        .status-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #000; border-top: 1px solid var(--border);
+            padding: 5px 15px; font-size: 10px; color: var(--primary);
+            font-family: var(--font-sys); display: flex; justify-content: space-between;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-overlay"></div>
+<div class="bg-overlay"></div>
 
-    <div class="wrapper">
-        <nav>
-            <div class="logo-area">
-                <h1>CENTRAL GOV.</h1>
-                <small style="color: #444; font-size: 0.6rem;">INTELLIGENCE AGENCY</small>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item active" onclick="navTo('home')">DASHBOARD</li>
-                <li class="nav-item" onclick="navTo('world')">WORLD VIEW</li>
-                <li class="nav-item" onclick="navTo('characters')">CHARACTERS</li>
-                <li class="nav-item" onclick="navTo('archive')">CLASSIFIED</li>
-                <li class="nav-item" onclick="alert('데이터가 아직 동기화되지 않았습니다.')">SETTINGS</li>
-            </ul>
-        </nav>
-
-        <main>
-            <section id="home" class="page active">
-                <h2>DASHBOARD</h2>
-                <div class="card" style="width: 100%; margin-bottom: 30px;">
-                    <span class="tag">ALERT: LEVEL 4 ACCESS</span>
-                    <h3>환영합니다, 관리자님.</h3>
-                    <p>현재 시스템은 정상 작동 중이며, 모든 개체의 동향을 감시하고 있습니다. 최근 '대균열' 에너지는 안정 수치를 유지하고 있습니다.</p>
-                </div>
-                <div class="grid">
-                    <div class="card" onclick="navTo('world')">
-                        <h3>지침 확인</h3>
-                        <p>기관 운영 규칙 및 세계관 기본 지침을 확인하십시오.</p>
-                    </div>
-                    <div class="card" onclick="navTo('characters')">
-                        <h3>개체 리스트</h3>
-                        <p>등록된 특수 능력 개체들의 상세 정보를 열람합니다.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="world" class="page">
-                <h2>WORLD VIEW</h2>
-                <div class="card" style="line-height: 2; margin-bottom: 20px;">
-                    <h3>[ 세계관 명칭 : 여기에 입력 ]</h3>
-                    <p>본 세계관은 현대 서울을 배경으로 하며, 20XX년 발생한 '이변' 이후의 이야기를 다룹니다.</p>
-                    <p>- <b>기관 설명:</b> 정부 산하 특수 관리국은 변이 개체를 격리 및 관리합니다.</p>
-                    <p>- <b>등급 체계:</b> S급부터 F급까지 엄격한 등급제로 분류됩니다.</p>
-                </div>
-                <button class="btn" onclick="alert('추가 문서를 불러오는 중...')">더 많은 기록 열람</button>
-            </section>
-
-            <section id="characters" class="page">
-                <h2>CHARACTERS</h2>
-                <div class="grid">
-                    <div class="card" onclick="openChar('한시우', 'S등급 / 염동력자', '서울 중앙 관리국 소속. 강력한 염동력을 구사하며 성격은 냉철함.')">
-                        <span class="tag">RANK S</span>
-                        <h3>한시우</h3>
-                        <p>특이사항: 관리 대상 01호</p>
-                    </div>
-                    <div class="card" onclick="openChar('리아', 'A등급 / 치유사', '비전투 요원. 치명적인 상처도 즉각 재생시키는 능력을 보유.')">
-                        <span class="tag">RANK A</span>
-                        <h3>리아</h3>
-                        <p>특이사항: 주요 보호 대상</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="archive" class="page">
-                <h2>CLASSIFIED</h2>
-                <div style="background: rgba(255,0,0,0.05); padding: 20px; border: 1px dashed var(--danger);">
-                    <h3 style="color: var(--danger);">접근 제한구역</h3>
-                    <p>인가되지 않은 요원은 이 문서를 볼 수 없습니다. (비공개 설정/아이템/떡밥 등)</p>
-                    <br>
-                    <button class="btn" onclick="prompt('암호를 입력하십시오.')">DECRYPT</button>
-                </div>
-            </section>
-        </main>
+<header class="mobile-header">
+    <div class="logo-area" style="padding:0; margin:0;">
+        <h1 style="font-size:0.9rem;">CENTRAL GOV.</h1>
     </div>
+    <button class="btn-menu" onclick="toggleMenu()">☰</button>
+</header>
 
-    <div id="charModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">[CLOSE_X]</span>
-            <h2 id="modalName" style="margin-bottom: 10px;">Name</h2>
-            <h4 id="modalTag" style="color: var(--primary); margin-bottom: 20px;">Rank</h4>
-            <div id="modalDesc" style="line-height: 1.8; color: #ccc;">Description</div>
-            <br>
-            <button class="btn" onclick="closeModal()">CONFIRM</button>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="logo-area">
+            <h1>SYSTEM</h1>
+            <small style="color:#444; font-size:0.6rem;">VER 4.2.0-STABLE</small>
         </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="navTo('home')">DASHBOARD</li>
+            <li class="nav-item" onclick="navTo('world')">WORLD VIEW</li>
+            <li class="nav-item" onclick="navTo('chars')">CHARACTERS</li>
+            <li class="nav-item" onclick="navTo('docs')">CLASSIFIED</li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="home" class="page active">
+            <h2 style="font-family: var(--font-sys); margin-bottom:20px;">DASHBOARD</h2>
+            <div class="card" style="margin-bottom:20px; border-left: 4px solid var(--primary);">
+                <h3 style="color:var(--primary); font-size:1rem;">[접속 승인]</h3>
+                <p style="font-size:0.9rem; margin-top:10px;">모든 기기에서의 보안 접속이 확인되었습니다. 현재 데이터 동기화가 완료되었습니다.</p>
+            </div>
+            <div class="grid">
+                <div class="card" onclick="navTo('world')">
+                    <h3 style="font-size:1rem;">지침 열람</h3>
+                    <p style="font-size:0.8rem; color:#888;">세계관 규정 및 주요 사건 기록</p>
+                </div>
+                <div class="card" onclick="navTo('chars')">
+                    <h3 style="font-size:1rem;">개체 확인</h3>
+                    <p style="font-size:0.8rem; color:#888;">등록된 초능력자 데이터베이스</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="world" class="page">
+            <h2 style="font-family: var(--font-sys); margin-bottom:20px;">WORLD VIEW</h2>
+            <div class="card">
+                <p style="margin-bottom:15px;">이곳에 세계관 설정을 입력하세요. </p>
+                <p style="color:#888; font-size:0.9rem;">반응형 그리드 시스템이 적용되어 어떤 화면에서도 텍스트가 가독성 있게 표시됩니다.</p>
+            </div>
+        </section>
+
+        <section id="chars" class="page">
+            <h2 style="font-family: var(--font-sys); margin-bottom:20px;">CHARACTERS</h2>
+            <div class="grid">
+                <div class="card" onclick="openModal('한시우', 'S-Rank / Psychokinesis', '서울 중앙 관리본부 소속 요원. 어떤 기기에서도 프로필이 잘 보입니다.')">
+                    <h3 style="font-size:1rem; color:var(--primary);">한시우</h3>
+                    <span style="font-size:0.7rem; color:var(--danger);">RANK S</span>
+                </div>
+                <div class="card" onclick="openModal('리아', 'A-Rank / Healer', '팀의 생존을 책임지는 힐러. 태블릿과 모바일 최적화 완료.')">
+                    <h3 style="font-size:1rem; color:var(--primary);">리아</h3>
+                    <span style="font-size:0.7rem; color:var(--danger);">RANK A</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="docs" class="page">
+            <h2 style="font-family: var(--font-sys); margin-bottom:20px;">CLASSIFIED</h2>
+            <div class="card" style="border: 1px dashed var(--danger);">
+                <p style="color:var(--danger);">[기밀] 허가된 기기 외 접근 금지</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="modal" class="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h2 id="m-name" style="margin-bottom:10px; font-size:1.5rem;">이름</h2>
+        <h4 id="m-rank" style="color:var(--primary); margin-bottom:20px; font-size:0.9rem;">등급</h4>
+        <p id="m-desc" style="color:#bbb; font-size:0.9rem; line-height:1.6;">설명</p>
+        <button onclick="closeModal()" style="margin-top:30px; width:100%; padding:10px; background:none; border:1px solid var(--primary); color:var(--primary); cursor:pointer;">CLOSE</button>
     </div>
+</div>
 
-    <div class="bottom-bar">
-        <div>STATUS: ENCRYPTED</div>
-        <div id="clock">DATE-TIME: 2026-04-21 00:00:00</div>
-    </div>
+<div class="status-bar">
+    <span>SYSTEM ACTIVE</span>
+    <span id="time-display"></span>
+</div>
 
-    <script>
-        // 1. 네비게이션 함수 (페이지 전환)
-        function navTo(pageId) {
-            // 모든 페이지 숨기기
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // 선택한 페이지만 보이기
-            document.getElementById(pageId).classList.add('active');
+<script>
+    // 1. 페이지 전환
+    function navTo(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        // 메뉴명과 id 매칭 (수동 매칭 또는 텍스트 포함 여부로)
+        event.currentTarget.classList.add('active');
 
-            // 메뉴 스타일 변경
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            const activeItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.innerText.includes(pageId.toUpperCase()) || (pageId === 'home' && item.innerText === 'DASHBOARD'));
-            if(activeItem) activeItem.classList.add('active');
+        // 모바일일 경우 메뉴 닫기
+        if(window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('open');
         }
+    }
 
-        // 2. 캐릭터 모달 열기/닫기
-        function openChar(name, tag, desc) {
-            document.getElementById('modalName').innerText = name;
-            document.getElementById('modalTag').innerText = tag;
-            document.getElementById('modalDesc').innerText = desc;
-            document.getElementById('charModal').style.display = 'flex';
-        }
+    // 2. 모바일 메뉴 토글
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
 
-        function closeModal() {
-            document.getElementById('charModal').style.display = 'none';
-        }
+    // 3. 캐릭터 모달
+    function openModal(name, rank, desc) {
+        document.getElementById('m-name').innerText = name;
+        document.getElementById('m-rank').innerText = rank;
+        document.getElementById('m-desc').innerText = desc;
+        document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
 
-        // 3. 실시간 시계
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-            document.getElementById('clock').innerText = "SYSTEM_TIME: " + timeStr;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+    // 4. 시간 표시
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('time-display').innerText = now.toLocaleString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+</script>
 
-        // 4. 배경 소음 효과음 (선택사항 - 클릭 시 간단한 효과)
-        document.addEventListener('click', () => {
-            // 여기에 아주 작은 시스템 효과음을 넣으면 더 좋습니다.
-        });
-    </script>
 </body>
 </html>
