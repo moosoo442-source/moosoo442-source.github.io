@@ -3,229 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Creative Archive</title>
+    <title>CENTRAL GOV. SYSTEM</title>
     <style>
-        /* CSS: 디자인 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
         :root {
-            --bg-color: #ffffff;
-            --text-color: #1d1d1f;
-            --accent-color: #0071e3;
-            --secondary-bg: #f5f5f7;
-            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #00f2ff; /* 시스템 사이언 */
+            --danger: #ff3e3e;
+            --bg-dark: #050507;
+            --panel-bg: rgba(20, 20, 25, 0.8);
+            --border: rgba(0, 242, 255, 0.3);
+            --text-main: #e0e0e0;
+            --font-sys: 'Orbitron', sans-serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro KR", "Malgun Gothic", sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden; /* 사이드바 고정 위해 */
         }
 
-        /* 헤더 & 네비게이션 */
-        header {
+        /* 배경 글리치 효과 */
+        .bg-overlay {
             position: fixed;
-            top: 0;
-            width: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
             z-index: 1000;
-            transition: var(--transition);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            pointer-events: none;
         }
 
+        /* 메인 레이아웃 */
+        .wrapper { display: flex; height: 100vh; }
+
+        /* 사이드바 */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 8%;
-        }
-
-        .logo {
-            font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: -0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2.5rem;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-size: 0.95rem;
-            font-weight: 400;
-            opacity: 0.8;
-            transition: var(--transition);
-        }
-
-        nav a:hover {
-            opacity: 1;
-            color: var(--accent-color);
-        }
-
-        /* 메인 히어로 섹션 */
-        .hero {
-            height: 100vh;
+            width: 260px;
+            background: rgba(10, 10, 15, 0.95);
+            border-right: 1px solid var(--border);
+            padding: 30px 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            z-index: 100;
+        }
+
+        .logo-area {
+            padding: 0 30px 40px;
             text-align: center;
-            padding: 0 20px;
         }
 
-        .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 800;
-            letter-spacing: -2px;
-            margin-bottom: 1rem;
-            background: linear-gradient(180deg, #1d1d1f 0%, #434344 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
+        .logo-area h1 {
+            font-family: var(--font-sys);
             font-size: 1.2rem;
-            color: #86868b;
-            max-width: 600px;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            letter-spacing: 2px;
         }
 
-        /* 카드 그리드 섹션 */
-        .container {
-            padding: 100px 8%;
-            background-color: var(--secondary-bg);
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #666;
+            font-family: var(--font-sys);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid transparent;
         }
 
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary);
+            background: rgba(0, 242, 255, 0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* 컨텐츠 영역 */
+        main {
+            flex-grow: 1;
+            padding: 60px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .page { display: none; animation: pageIn 0.4s ease; }
+        .page.active { display: block; }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        h2 {
+            font-family: var(--font-sys);
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        /* 카드 그리드 */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
         }
 
         .card {
-            background: var(--bg-color);
-            padding: 40px;
-            border-radius: 28px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            transition: var(--transition);
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 25px;
+            transition: 0.3s;
             cursor: pointer;
-            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
         }
 
         .card:hover {
-            transform: scale(1.02) translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            background: rgba(0, 242, 255, 0.1);
+            transform: translateY(-5px);
         }
 
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
+        .card h3 { margin-bottom: 10px; color: var(--primary); }
+        .card .tag { font-size: 0.7rem; color: var(--danger); font-weight: bold; margin-bottom: 15px; display: block; }
+
+        /* 캐릭터 상세 팝업 (모달) */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
         }
 
-        .card p {
-            color: #86868b;
+        .modal-content {
+            width: 800px;
+            background: var(--bg-dark);
+            border: 1px solid var(--primary);
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
         }
 
-        /* 애니메이션 효과 */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
+        .close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: var(--primary);
+            cursor: pointer;
+            font-family: var(--font-sys);
         }
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        /* 버튼 스타일 */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: var(--font-sys);
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
 
-        @media (max-width: 768px) {
-            nav ul { display: none; }
-            .grid { grid-template-columns: 1fr; }
+        .btn:hover { background: var(--primary); color: #000; }
+
+        /* 하단 바 */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0; left: 260px; right: 0;
+            background: rgba(10, 10, 15, 0.9);
+            padding: 10px 30px;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-sys);
+            font-size: 0.7rem;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
 <body>
 
-    <header id="header">
+    <div class="bg-overlay"></div>
+
+    <div class="wrapper">
         <nav>
-            <div class="logo">PORTFOLIO.</div>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#work">Work</a></li>
-                <li><a href="#about">About</a></li>
+            <div class="logo-area">
+                <h1>CENTRAL GOV.</h1>
+                <small style="color: #444; font-size: 0.6rem;">INTELLIGENCE AGENCY</small>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="navTo('home')">DASHBOARD</li>
+                <li class="nav-item" onclick="navTo('world')">WORLD VIEW</li>
+                <li class="nav-item" onclick="navTo('characters')">CHARACTERS</li>
+                <li class="nav-item" onclick="navTo('archive')">CLASSIFIED</li>
+                <li class="nav-item" onclick="alert('데이터가 아직 동기화되지 않았습니다.')">SETTINGS</li>
             </ul>
         </nav>
-    </header>
 
-    <section class="hero" id="home">
-        <h1 class="reveal">Create with passion.</h1>
-        <p class="reveal">10년 차 개발자가 설계한 정적 웹사이트 템플릿입니다. 깃허브에서 가장 빛나는 포트폴리오를 만들어보세요.</p>
-    </section>
+        <main>
+            <section id="home" class="page active">
+                <h2>DASHBOARD</h2>
+                <div class="card" style="width: 100%; margin-bottom: 30px;">
+                    <span class="tag">ALERT: LEVEL 4 ACCESS</span>
+                    <h3>환영합니다, 관리자님.</h3>
+                    <p>현재 시스템은 정상 작동 중이며, 모든 개체의 동향을 감시하고 있습니다. 최근 '대균열' 에너지는 안정 수치를 유지하고 있습니다.</p>
+                </div>
+                <div class="grid">
+                    <div class="card" onclick="navTo('world')">
+                        <h3>지침 확인</h3>
+                        <p>기관 운영 규칙 및 세계관 기본 지침을 확인하십시오.</p>
+                    </div>
+                    <div class="card" onclick="navTo('characters')">
+                        <h3>개체 리스트</h3>
+                        <p>등록된 특수 능력 개체들의 상세 정보를 열람합니다.</p>
+                    </div>
+                </div>
+            </section>
 
-    <section class="container" id="work">
-        <h2 class="reveal" style="font-size: 2.5rem; text-align: center;">Selected Works</h2>
-        <div class="grid">
-            <div class="card reveal">
-                <h3>UI/UX Design</h3>
-                <p>사용자 중심의 직관적인 인터페이스를 설계하고 최상의 디지털 경험을 제공합니다.</p>
-            </div>
-            <div class="card reveal">
-                <h3>Web Development</h3>
-                <p>최신 기술 스택을 활용하여 빠르고 안정적인 반응형 웹사이트를 구축합니다.</p>
-            </div>
-            <div class="card reveal">
-                <h3>Visual Storytelling</h3>
-                <p>브랜드의 가치를 시각적으로 전달하는 독창적인 그래픽 요소를 제작합니다.</p>
-            </div>
+            <section id="world" class="page">
+                <h2>WORLD VIEW</h2>
+                <div class="card" style="line-height: 2; margin-bottom: 20px;">
+                    <h3>[ 세계관 명칭 : 여기에 입력 ]</h3>
+                    <p>본 세계관은 현대 서울을 배경으로 하며, 20XX년 발생한 '이변' 이후의 이야기를 다룹니다.</p>
+                    <p>- <b>기관 설명:</b> 정부 산하 특수 관리국은 변이 개체를 격리 및 관리합니다.</p>
+                    <p>- <b>등급 체계:</b> S급부터 F급까지 엄격한 등급제로 분류됩니다.</p>
+                </div>
+                <button class="btn" onclick="alert('추가 문서를 불러오는 중...')">더 많은 기록 열람</button>
+            </section>
+
+            <section id="characters" class="page">
+                <h2>CHARACTERS</h2>
+                <div class="grid">
+                    <div class="card" onclick="openChar('한시우', 'S등급 / 염동력자', '서울 중앙 관리국 소속. 강력한 염동력을 구사하며 성격은 냉철함.')">
+                        <span class="tag">RANK S</span>
+                        <h3>한시우</h3>
+                        <p>특이사항: 관리 대상 01호</p>
+                    </div>
+                    <div class="card" onclick="openChar('리아', 'A등급 / 치유사', '비전투 요원. 치명적인 상처도 즉각 재생시키는 능력을 보유.')">
+                        <span class="tag">RANK A</span>
+                        <h3>리아</h3>
+                        <p>특이사항: 주요 보호 대상</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="archive" class="page">
+                <h2>CLASSIFIED</h2>
+                <div style="background: rgba(255,0,0,0.05); padding: 20px; border: 1px dashed var(--danger);">
+                    <h3 style="color: var(--danger);">접근 제한구역</h3>
+                    <p>인가되지 않은 요원은 이 문서를 볼 수 없습니다. (비공개 설정/아이템/떡밥 등)</p>
+                    <br>
+                    <button class="btn" onclick="prompt('암호를 입력하십시오.')">DECRYPT</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="charModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">[CLOSE_X]</span>
+            <h2 id="modalName" style="margin-bottom: 10px;">Name</h2>
+            <h4 id="modalTag" style="color: var(--primary); margin-bottom: 20px;">Rank</h4>
+            <div id="modalDesc" style="line-height: 1.8; color: #ccc;">Description</div>
+            <br>
+            <button class="btn" onclick="closeModal()">CONFIRM</button>
         </div>
-    </section>
+    </div>
+
+    <div class="bottom-bar">
+        <div>STATUS: ENCRYPTED</div>
+        <div id="clock">DATE-TIME: 2026-04-21 00:00:00</div>
+    </div>
 
     <script>
-        /* JS: 스크롤 애니메이션 및 인터랙션 */
-        
-        // 1. 스크롤 시 헤더 배경 변경
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            if (window.scrollY > 50) {
-                header.style.background = 'rgba(255, 255, 255, 0.7)';
-                header.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
-            } else {
-                header.style.background = 'transparent';
-                header.style.borderBottom = 'none';
-            }
-        });
+        // 1. 네비게이션 함수 (페이지 전환)
+        function navTo(pageId) {
+            // 모든 페이지 숨기기
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // 선택한 페이지만 보이기
+            document.getElementById(pageId).classList.add('active');
 
-        // 2. 요소 나타나기 애니메이션 (Scroll Reveal)
-        const revealElements = document.querySelectorAll('.reveal');
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, { threshold: 0.1 });
+            // 메뉴 스타일 변경
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const activeItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.innerText.includes(pageId.toUpperCase()) || (pageId === 'home' && item.innerText === 'DASHBOARD'));
+            if(activeItem) activeItem.classList.add('active');
+        }
 
-        revealElements.forEach(el => observer.observe(el));
+        // 2. 캐릭터 모달 열기/닫기
+        function openChar(name, tag, desc) {
+            document.getElementById('modalName').innerText = name;
+            document.getElementById('modalTag').innerText = tag;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('charModal').style.display = 'flex';
+        }
 
-        // 3. 부드러운 스크롤 이동
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
+        function closeModal() {
+            document.getElementById('charModal').style.display = 'none';
+        }
+
+        // 3. 실시간 시계
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+            document.getElementById('clock').innerText = "SYSTEM_TIME: " + timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 4. 배경 소음 효과음 (선택사항 - 클릭 시 간단한 효과)
+        document.addEventListener('click', () => {
+            // 여기에 아주 작은 시스템 효과음을 넣으면 더 좋습니다.
         });
     </script>
 </body>
